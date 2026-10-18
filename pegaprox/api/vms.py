@@ -12328,6 +12328,7 @@ def node_shell_websocket_proxy(ws, cluster_id, node):
     
     manager = cluster_managers[cluster_id]
     cluster_host = manager.config.host
+    cluster_port = getattr(manager.config, 'port', getattr(manager, 'api_port', 8006)) or 8006
     
     # Get node IP address from cluster status
     logging.info(f"Step 1: Getting IP for node {node}...")
