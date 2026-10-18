@@ -16966,21 +16966,7 @@
                                     className={`flex items-center ${isCorporate ? 'gap-2' : 'gap-4'} hover:opacity-80 transition-opacity`}
                                     title={t('allClustersOverview') || 'All Clusters Overview'}
                                 >
-                                    {/* HostPro Cloud Logo */}
-                                    <img
-                                        src={getLogoSrc()}
-                                        alt="HostPro Cloud"
-                                        className={`${isCorporate ? 'w-8 h-8' : 'w-12 h-12 rounded-xl'} object-contain`}
-                                        onError={(e) => {
-                                            e.target.style.display = 'none';
-                                            e.target.nextSibling.style.display = 'flex';
-                                        }}
-                                    />
-                                    <div className={`${isCorporate ? 'w-6 h-6 bg-proxmox-orange' : 'w-10 h-10 rounded-xl bg-gradient-to-br from-proxmox-orange to-orange-600 shadow-lg glow-orange'} items-center justify-center hidden`}>
-                                        <svg viewBox="0 0 24 24" className={`${isCorporate ? 'w-3.5 h-3.5' : 'w-6 h-6'} text-white`} fill="currentColor">
-                                            <path d="M12 2C9.5 2 7 3.5 6 6c-1.5 0-3 1-3 3 0 1.5 1 2.5 2 3l1 6c0 1 1 2 2 2h8c1 0 2-1 2-2l1-6c1-.5 2-1.5 2-3 0-2-1.5-3-3-3-1-2.5-3.5-4-6-4zm0 2c2 0 3.5 1 4 3H8c.5-2 2-3 4-3zM5 9h14c.5 0 1 .5 1 1s-.5 1.5-1 2l-1 5H6l-1-5c-.5-.5-1-1-1-2s.5-1 1-1zm7 1a2 2 0 100 4 2 2 0 000-4z"/>
-                                        </svg>
-                                    </div>
+
                                     {isCorporate ? (
                                         <span className="text-[13px] font-semibold">HostPro Cloud</span>
                                     ) : (
@@ -26841,36 +26827,7 @@
                         attribution with it. They are here because the servers, the domains and
                         the hours come out of our own pockets. NS Sep 2026
                     */}
-                    <footer className="border-t border-proxmox-border bg-proxmox-dark/50 mt-8">
-                        <div className="max-w-[800px] mx-auto px-6 py-6">
-                            <div className="text-center mb-4">
-                                <p className="text-sm text-gray-400">
-                                    ❤️ {t('thanksToSponsors') || 'Thanks to our Sponsors'}
-                                </p>
-                            </div>
-                            <div className="flex justify-center gap-3 flex-wrap">
-                                {/* Sponsor logos from /images/sponsors/ folder */}
-                                {[1, 2, 3, 4, 5, 6, 7, 8].map(num => (
-                                    <SponsorSlot key={num} num={num} />
-                                ))}
-                            </div>
-                            {/* LW Apr 2026: OpenCollective contribute CTA under sponsor logos */}
-                            <div className="flex justify-center mt-4">
-                                <a href="https://opencollective.com/pegaprox"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    title="Contribute on Open Collective">
-                                    <img src="/images/oc_contribute_button.png"
-                                        alt="Contribute to our Collective"
-                                        className="h-8 w-auto hover:opacity-90 transition-opacity" />
-                                </a>
-                            </div>
-                            <div className="text-center mt-4 text-xs text-gray-600">
-                                <p>HostPro Cloud {PEGAPROX_VERSION} • {t('madeWithLove') || 'Made with ❤️ for the Proxmox community'}</p>
-                            </div>
-                            <LegalNotice className="mt-2" />
-                        </div>
-                    </footer>
+                    {/* Sponsors footer removed */}
 
                     {/* LW: Mar 2026 - Event feed mini-panel */}
                     {isCorporate && showEventLog && corpEventLog.length > 0 && (

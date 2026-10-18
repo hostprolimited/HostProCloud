@@ -455,16 +455,7 @@
                         {/* NS 2026-07: real HostPro Cloud pegasus logo (was a generic Cloud icon).
                             Cloud-theme-aware: white pegasus on the dark shell, dark pegasus on
                             the light theme. Falls back to the Cloud icon if the asset 404s. */}
-                        <span className="cloud-nav-brand-mark">
-                            <img
-                                src={(typeof document !== 'undefined' && document.body && document.body.dataset.cloudTheme === 'light')
-                                    ? '/images/pegaprox-logo-light.png'
-                                    : '/images/pegaprox-logo-dark.png'}
-                                alt="HostPro Cloud"
-                                onError={(e) => { e.target.style.display = 'none'; const s = e.target.nextSibling; if (s) s.style.display = 'inline-flex'; }}
-                            />
-                            <span className="cloud-nav-brand-fallback" style={{ display: 'none' }}><Icons.Cloud /></span>
-                        </span>
+                        
                         {!collapsed && <span className="cloud-nav-brand-text">HostPro Cloud</span>}
                         {!collapsed && <span className="cloud-chip cloud-chip-preview">PREVIEW</span>}
                     </div>
@@ -2039,21 +2030,7 @@
         // + OC button as the classic footer, just sized for the cloud content area.
         // Reuses the global SponsorSlot so the mirror/GitHub self-heal applies here too.
         function CloudSponsorFooter({ t }) {
-            const label = (typeof t === 'function' && t('thanksToSponsors')) || 'Thanks to our Sponsors';
-            return (
-                <footer className="cloud-sponsors" style={{ marginTop: 28, paddingTop: 18, borderTop: '1px solid rgba(127,127,127,0.18)', textAlign: 'center' }}>
-                    <div style={{ fontSize: 12, opacity: 0.65, marginBottom: 12 }}>❤️ {label}</div>
-                    <div style={{ display: 'flex', justifyContent: 'center', gap: 12, flexWrap: 'wrap' }}>
-                        {[1, 2, 3, 4, 5, 6, 7, 8].map(num => <SponsorSlot key={num} num={num} />)}
-                    </div>
-                    <div style={{ marginTop: 14 }}>
-                        <a href="https://opencollective.com/pegaprox" target="_blank" rel="noopener noreferrer" title="Contribute on Open Collective">
-                            <img src="/images/oc_contribute_button.png" alt="Contribute on Open Collective" style={{ height: 26, opacity: 0.9 }} />
-                        </a>
-                    </div>
-                    <LegalNotice style={{marginTop: 12}} />
-                </footer>
-            );
+            return null;
         }
 
         // ═══ NS 2026-07 — cloud-native parity views (features that are inline in
