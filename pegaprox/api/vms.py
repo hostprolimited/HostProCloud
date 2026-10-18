@@ -5563,7 +5563,7 @@ def _rng_value(value):
     return ','.join(out), None
 
 
-@bp.route('/api/clusters/<cluster_id>/vms/<node>/<vm_type>/<int:vmid>/config', methods=['PUT'])
+@bp.route('/api/clusters/<cluster_id>/vms/<node>/<vm_type>/<int:vmid>/config', methods=['PUT', 'POST'])
 @require_auth(perms=['vm.config'])
 def update_vm_config_api(cluster_id, node, vm_type, vmid):
     ok, err = check_cluster_access(cluster_id)
@@ -13516,6 +13516,7 @@ def create_vm_api(cluster_id, node):
 
 
 @bp.route('/api/clusters/<cluster_id>/nodes/<node>/lxc', methods=['POST'])
+@bp.route('/api/clusters/<cluster_id>/vms/<node>/lxc', methods=['POST'])
 @require_auth(perms=["vm.create"])
 def create_container_api(cluster_id, node):
     """Create a new container on a node"""

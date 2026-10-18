@@ -14164,7 +14164,7 @@ echo "AGENT_INSTALLED_OK"
                 vmid = next_id['vmid']
             
             # Template is required for CT creation
-            template = ct_config.get('template')
+            template = ct_config.get('template') or ct_config.get('ostemplate')
             if not template:
                 return {'success': False, 'error': 'Template is required for container creation'}
             
@@ -14181,9 +14181,12 @@ echo "AGENT_INSTALLED_OK"
             }
             
             # Root disk
-            storage = ct_config.get('storage', 'local-lvm')
-            disk_size = ct_config.get('disk_size', '8')  # GB
-            data['rootfs'] = f"{storage}:{disk_size}"
+            if ct_config.get('rootfs'):
+                data['rootfs'] = ct_config.get('rootfs')
+            else:
+                storage = ct_config.get('storage', 'local-lvm')
+                disk_size = ct_config.get('disk_size', '8')  # GB
+                data['rootfs'] = f"{storage}:{disk_size}"
             
             # MK: Additional Mount Points
             # NS May 2026 (PVE 9.2) — mountpoints gained idmap=<map> and
@@ -14207,78 +14210,85 @@ echo "AGENT_INSTALLED_OK"
                 data[f'mp{idx}'] = ','.join(parts)
             
             # Network configuration
-            # NS: this networking stuff is confusing, proxmox docs are not great
-            net_bridge = ct_config.get('net_bridge', 'vmbr0')
-            net_str = f"name=eth0,bridge={net_bridge}"
-            
-            # IPv4 configuration
-            net_ip_type = ct_config.get('net_ip_type', 'dhcp')
-            if net_ip_type == 'dhcp':
-                net_str += ",ip=dhcp"
-            elif net_ip_type == 'static':
-                net_ip = ct_config.get('net_ip', '')
-                if net_ip:
-                    net_str += f",ip={net_ip}"
-                    if ct_config.get('net_gw'):
-                        net_str += f",gw={ct_config['net_gw']}"
-            # 'manual' = no ip config
-            
-            # IPv6 configuration
-            net_ip6_type = ct_config.get('net_ip6_type', 'dhcp')
-            if net_ip6_type == 'dhcp':
-                net_str += ",ip6=dhcp"
-            elif net_ip6_type == 'slaac':
-                net_str += ",ip6=auto"
-            elif net_ip6_type == 'static':
-                net_ip6 = ct_config.get('net_ip6', '')
-                if net_ip6:
-                    net_str += f",ip6={net_ip6}"
-                    if ct_config.get('net_gw6'):
-                        net_str += f",gw6={ct_config['net_gw6']}"
-            # 'manual' = no ip6 config
-            
-            # VLAN tag
-            if ct_config.get('net_tag'):
-                net_str += f",tag={ct_config['net_tag']}"
-            
-            # Firewall
-            if ct_config.get('net_firewall'):
-                net_str += ",firewall=1"
-            
-            # Disconnected
-            if ct_config.get('net_disconnected'):
-                net_str += ",link_down=1"
-            
-            # MK: MAC Address
-            if ct_config.get('net_macaddr'):
-                net_str += f",hwaddr={ct_config['net_macaddr']}"
-            
-            # MK: MTU
-            if ct_config.get('net_mtu'):
-                net_str += f",mtu={ct_config['net_mtu']}"
-            
-            # MK: Rate Limit (MB/s)
-            if ct_config.get('net_rate'):
-                net_str += f",rate={ct_config['net_rate']}"
-            
-            data['net0'] = net_str
+            if ct_config.get('net0'):
+                data['net0'] = ct_config['net0']
+            else:
+                # NS: this networking stuff is confusing, proxmox docs are not great
+                net_bridge = ct_config.get('net_bridge', 'vmbr0')
+                net_str = f"name=eth0,bridge={net_bridge}"
+                
+                # IPv4 configuration
+                net_ip_type = ct_config.get('net_ip_type', 'dhcp')
+                if net_ip_type == 'dhcp':
+                    net_str += ",ip=dhcp"
+                elif net_ip_type == 'static':
+                    net_ip = ct_config.get('net_ip', '')
+                    if net_ip:
+                        net_str += f",ip={net_ip}"
+                        if ct_config.get('net_gw'):
+                            net_str += f",gw={ct_config['net_gw']}"
+                # 'manual' = no ip config
+                
+                # IPv6 configuration
+                net_ip6_type = ct_config.get('net_ip6_type', 'dhcp')
+                if net_ip6_type == 'dhcp':
+                    net_str += ",ip6=dhcp"
+                elif net_ip6_type == 'slaac':
+                    net_str += ",ip6=auto"
+                elif net_ip6_type == 'static':
+                    net_ip6 = ct_config.get('net_ip6', '')
+                    if net_ip6:
+                        net_str += f",ip6={net_ip6}"
+                        if ct_config.get('net_gw6'):
+                            net_str += f",gw6={ct_config['net_gw6']}"
+                # 'manual' = no ip6 config
+                
+                # VLAN tag
+                if ct_config.get('net_tag'):
+                    net_str += f",tag={ct_config['net_tag']}"
+                
+                # Firewall
+                if ct_config.get('net_firewall'):
+                    net_str += ",firewall=1"
+                
+                # Disconnected
+                if ct_config.get('net_disconnected'):
+                    net_str += ",link_down=1"
+                
+                # MK: MAC Address
+                if ct_config.get('net_macaddr'):
+                    net_str += f",hwaddr={ct_config['net_macaddr']}"
+                
+                # MK: MTU
+                if ct_config.get('net_mtu'):
+                    net_str += f",mtu={ct_config['net_mtu']}"
+                
+                # MK: Rate Limit (MB/s)
+                if ct_config.get('net_rate'):
+                    net_str += f",rate={ct_config['net_rate']}"
+                
+                data['net0'] = net_str
             
             # DNS settings
             if ct_config.get('dns_domain'):
                 data['searchdomain'] = ct_config['dns_domain']
-            if ct_config.get('dns_servers'):
+            if ct_config.get('nameserver'):
+                data['nameserver'] = ct_config['nameserver']
+            elif ct_config.get('dns_servers'):
                 data['nameserver'] = ct_config['dns_servers']
             
             # Unprivileged
             if ct_config.get('unprivileged', True):
                 data['unprivileged'] = '1'
             
-            # Start on boot
+            # Start on boot / start immediately
             if ct_config.get('onboot'):
                 data['onboot'] = '1'
+            if ct_config.get('start'):
+                data['start'] = '1'
             
             # SSH public keys
-            ssh_keys = ct_config.get('ssh_public_keys') or ct_config.get('ssh_key')
+            ssh_keys = ct_config.get('ssh-public-keys') or ct_config.get('ssh_public_keys') or ct_config.get('ssh_key')
             if ssh_keys:
                 data['ssh-public-keys'] = ssh_keys
             
