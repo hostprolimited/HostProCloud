@@ -106,8 +106,10 @@ PLUGINS_DIR = 'plugins'
 # main() creates what it needs before generating a cert.
 def _config_owned_by_us():
     try:
+        if not hasattr(os, 'geteuid'):
+            return True
         return os.stat(CONFIG_DIR).st_uid == os.geteuid()
-    except OSError:
+    except (OSError, AttributeError):
         return True      # not there yet, we are the one creating it
 
 
