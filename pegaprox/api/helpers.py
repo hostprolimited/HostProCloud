@@ -418,6 +418,21 @@ def check_cluster_access(cluster_id):
     """
     from flask import request, jsonify, g
     from pegaprox.utils.rbac import get_user_clusters
+    
+    # Map cluster name to real cluster_id if caller used name (e.g. "DC")
+    if cluster_id not in cluster_managers:
+        for cid, mgr in cluster_managers.items():
+            if getattr(getattr(mgr, 'config', None), 'name', '').lower() == str(cluster_id).lower():
+                cluster_id = cid
+                break
+    else:
+        # Even if cluster_id matched via ClusterManagersDict fallback, get the canonical key
+        if cluster_id not in dict.keys(cluster_managers):
+            for cid, mgr in cluster_managers.items():
+                if getattr(getattr(mgr, 'config', None), 'name', '').lower() == str(cluster_id).lower():
+                    cluster_id = cid
+                    break
+
     user = acting_user()
     allowed = get_user_clusters(user)
     if allowed is not None and cluster_id not in allowed:

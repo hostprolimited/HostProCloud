@@ -9,8 +9,34 @@ import threading
 
 # NS: all the global state was scattered across 51k lines before, at least now its in one place
 
+class ClusterManagersDict(dict):
+    """Dictionary mapping cluster_id to manager, with transparent fallback lookup by cluster name."""
+    def __contains__(self, key):
+        if super().__contains__(key):
+            return True
+        for k, mgr in self.items():
+            name = getattr(getattr(mgr, 'config', None), 'name', '')
+            if name and (name == key or name.lower() == str(key).lower()):
+                return True
+        return False
+
+    def __getitem__(self, key):
+        if super().__contains__(key):
+            return super().__getitem__(key)
+        for k, mgr in self.items():
+            name = getattr(getattr(mgr, 'config', None), 'name', '')
+            if name and (name == key or name.lower() == str(key).lower()):
+                return mgr
+        raise KeyError(key)
+
+    def get(self, key, default=None):
+        try:
+            return self[key]
+        except KeyError:
+            return default
+
 # Global cluster managers: cluster_id -> PegaProxManager or XcpngManager
-cluster_managers = {}
+cluster_managers = ClusterManagersDict()
 
 # PBS managers: pbs_id -> PBSManager
 pbs_managers = {}
