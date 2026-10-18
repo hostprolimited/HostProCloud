@@ -4000,8 +4000,63 @@ def clear_update_status_api(cluster_id, node_name):
     return jsonify({'error': f'No completed update found for {node_name}'}), 400
 
 
+@bp.route('/api/clusters/<cluster_id>/vms/<node>/<vm_type>/<int:vmid>/status', methods=['GET'])
+@bp.route('/api/clusters/<cluster_id>/vms/<node>/<vm_type>/<int:vmid>/status/current', methods=['GET'])
+@require_auth(perms=['vm.view'])
+def get_vm_status_api(cluster_id, node, vm_type, vmid):
+    ok, err = check_cluster_access(cluster_id)
+    if not ok: return err
+
+    if cluster_id not in cluster_managers:
+        return jsonify({'error': 'Cluster not found'}), 404
+
+    manager = cluster_managers[cluster_id]
+    try:
+        host, port = manager.host, manager.api_port
+        session = manager._create_session()
+        
+        # 1. Try requested node and type
+        url = f"https://{host}:{port}/api2/json/nodes/{node}/{vm_type}/{vmid}/status/current"
+        r = session.get(url, timeout=10)
+        if r.status_code == 200:
+            data = r.json().get('data', {})
+            data['type'] = vm_type
+            data['node'] = node
+            return jsonify(data)
+        
+        # 2. Try alternate vm_type (lxc vs qemu) on same node
+        alt_type = 'lxc' if vm_type == 'qemu' else 'qemu'
+        alt_url = f"https://{host}:{port}/api2/json/nodes/{node}/{alt_type}/{vmid}/status/current"
+        r_alt = session.get(alt_url, timeout=10)
+        if r_alt.status_code == 200:
+            data = r_alt.json().get('data', {})
+            data['type'] = alt_type
+            data['node'] = node
+            return jsonify(data)
+
+        # 3. Search cluster resources
+        resources = manager.get_vm_resources()
+        for res in resources:
+            if int(res.get('vmid', 0)) == int(vmid):
+                actual_node = res.get('node', node)
+                actual_type = res.get('type', vm_type)
+                found_url = f"https://{host}:{port}/api2/json/nodes/{actual_node}/{actual_type}/{vmid}/status/current"
+                r_found = session.get(found_url, timeout=10)
+                if r_found.status_code == 200:
+                    data = r_found.json().get('data', {})
+                    data['type'] = actual_type
+                    data['node'] = actual_node
+                    return jsonify(data)
+                return jsonify(res)
+
+        return jsonify({'status': 'unknown', 'error': r.text}), r.status_code
+    except Exception as e:
+        return jsonify({'status': 'unknown', 'error': str(e)}), 500
+
+
 # VM Control API Routes
 @bp.route('/api/clusters/<cluster_id>/vms/<node>/<vm_type>/<int:vmid>/<action>', methods=['POST'])
+@bp.route('/api/clusters/<cluster_id>/vms/<node>/<vm_type>/<int:vmid>/status/<action>', methods=['POST'])
 @require_auth()
 def vm_action_api(cluster_id, node, vm_type, vmid, action):
     """Perform action on VM (start, stop, shutdown, reboot, reset, suspend, resume)
@@ -7253,6 +7308,7 @@ def check_snapshot_capability_api(cluster_id, node, vm_type, vmid):
 
 
 @bp.route('/api/clusters/<cluster_id>/vms/<node>/<vm_type>/<int:vmid>/snapshots', methods=['GET'])
+@bp.route('/api/clusters/<cluster_id>/vms/<node>/<vm_type>/<int:vmid>/snapshot', methods=['GET'])
 @require_auth(perms=['vm.view'])
 def get_snapshots_api(cluster_id, node, vm_type, vmid):
     """Get list of snapshots for a VM/CT"""
@@ -7270,6 +7326,7 @@ def get_snapshots_api(cluster_id, node, vm_type, vmid):
 
 
 @bp.route('/api/clusters/<cluster_id>/vms/<node>/<vm_type>/<int:vmid>/snapshots', methods=['POST'])
+@bp.route('/api/clusters/<cluster_id>/vms/<node>/<vm_type>/<int:vmid>/snapshot', methods=['POST'])
 @require_auth(perms=['vm.snapshot'])
 def create_snapshot_api(cluster_id, node, vm_type, vmid):
     # tenant check
@@ -12610,11 +12667,17 @@ def delete_vm_api(cluster_id, node, vm_type, vmid):
     if denied: return denied
 
     manager = cluster_managers[cluster_id]
-    data = request.json or {}
-    purge = data.get('purge', False)
-    destroy_unreferenced = data.get('destroyUnreferenced', False)
+    data = request.get_json(silent=True) or {}
+    purge = data.get('purge', True)
+    destroy_unreferenced = data.get('destroyUnreferenced', True)
     
     result = manager.delete_vm(node, vmid, vm_type, purge, destroy_unreferenced)
+    if not result.get('success'):
+        alt_type = 'lxc' if vm_type == 'qemu' else 'qemu'
+        alt_result = manager.delete_vm(node, vmid, alt_type, purge, destroy_unreferenced)
+        if alt_result.get('success'):
+            result = alt_result
+            vm_type = alt_type
     
     if result.get('success'):
         usr = getattr(request, 'session', {}).get('user', 'system')
