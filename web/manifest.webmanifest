@@ -1,12 +1,12 @@
 {
-  "name": "PegaProx",
-  "short_name": "PegaProx",
-  "description": "Multi-cluster Proxmox VE management",
+  "name": "Host Pro Cloud",
+  "short_name": "HostPro",
+  "description": "Multi-cluster Proxmox VE Cloud Management Platform",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#0c1117",
-  "theme_color": "#E57000",
+  "theme_color": "#2563eb",
   "orientation": "any",
   "lang": "en",
   "icons": [

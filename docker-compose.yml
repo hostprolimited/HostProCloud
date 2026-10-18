@@ -1,4 +1,4 @@
-# PegaProx Docker Compose
+# HostPro Cloud Docker Compose
 # NS: just run: docker compose up -d
 
 services:
@@ -32,7 +32,7 @@ services:
     #   PEGAPROX_ALLOWED_ORIGINS: "https://pegaprox.example.com"
 
   # MK Oct 2026 (#625) - the witness: the third vote of an automatic group, at a third
-  # site and never on a host that runs PegaProx. Same image, the command `witness`.
+  # site and never on a host that runs HostPro Cloud. Same image, the command `witness`.
   # "Add witness" on the leader's HA page shows a `docker run` line for it; as a compose
   # service, put the code from there into the command for the first start (it pairs
   # once and is left out on every start after), then: docker compose up -d pegaprox-witness

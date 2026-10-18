@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-PegaProx Server - Cluster Management Backend for Proxmox VE
+HostPro Cloud Server - Cluster Management Backend for Proxmox VE
 Version: 0.7.0 Beta
 
-Copyright (C) 2025-2026 PegaProx Team
+Copyright (C) 2025-2026 HostPro Team
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by
@@ -117,7 +117,7 @@ def print_system_requirements():
     """Print recommended system requirements"""
     print("""
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║                    PegaProx System Requirements Guide                         ║
+║                    HostPro Cloud System Requirements Guide                         ║
 ║                           Version 0.7.0 Beta - Feb 2026                       ║
 ╠══════════════════════════════════════════════════════════════════════════════╣
 ║  Clusters │ Concurrent │  CPU    │  RAM   │  Disk  │  Notes                  ║
@@ -208,7 +208,7 @@ if __name__ == '__main__':
         sys.exit(0)
     elif '--help' in sys.argv or '-h' in sys.argv:
         print("""
-PegaProx Server
+HostPro Cloud Server
 
 Usage:
   python pegaprox_multi_cluster.py [options]
@@ -249,7 +249,7 @@ Env vars:
             elif os.path.exists(venv_python) or os.path.exists(venv_python2):
                 venv_bin = venv_python if os.path.exists(venv_python) else venv_python2
                 print(f"\n  Missing dependency: {e}")
-                print(f"\n  A virtual environment exists. Use it to start PegaProx:")
+                print(f"\n  A virtual environment exists. Use it to start HostPro Cloud:")
                 print(f"    {venv_bin} {os.path.abspath(__file__)}")
                 print(f"\n  Or via systemd:")
                 print(f"    systemctl start pegaprox\n")

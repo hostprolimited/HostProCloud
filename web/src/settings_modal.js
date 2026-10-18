@@ -578,7 +578,7 @@
         }
 
 
-        // LW Sep 2026 - Automated installations. PegaProx serves answer files to the
+        // LW Sep 2026 - Automated installations. HostPro Cloud serves answer files to the
         // Proxmox auto-installer and lists the machines that fetched one. The server
         // hands the token out once, so the reveal box carries the finished prepare-iso
         // command rather than the bare token.
@@ -1120,7 +1120,7 @@
                                 {hashOpen && !readOnly && !editing.answer_redacted && (
                                     // the clear password goes to the server once and only the hash comes back into the file
                                     // a div, not a form: a submitted form that then clears or goes away is what makes
-                                    // browsers offer to save the node's root password as the PegaProx login
+                                    // browsers offer to save the node's root password as the HostPro Cloud login
                                     <div className="mb-2 p-3 bg-proxmox-card border border-proxmox-border rounded-lg space-y-2"
                                         onKeyDown={e => { if (e.key === 'Enter' && !e.defaultPrevented && e.target.tagName === 'INPUT') { e.preventDefault(); if (!busy && hashPw) hashIntoAnswer(); } }}>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -2262,7 +2262,7 @@
 
             // Enter in a field means Next. Deliberately not a <form>: the root step holds a
             // password pair, and a submitted form that disappears makes browsers offer to
-            // save it as the PegaProx login. Textareas (SSH keys) keep their newlines.
+            // save it as the HostPro Cloud login. Textareas (SSH keys) keep their newlines.
             const body = result ? renderResult() : (
                 <div onKeyDown={e => {
                     // a field that handled Enter itself (the disk chips) called preventDefault,
@@ -2690,11 +2690,11 @@
         }
 
         // ═══════════════════════════════════════════════
-        // PegaProx - Settings Modal
-        // PegaProxSettingsModal (Server, SSL, SMTP, RBAC, Audit, Tenants)
+        // HostPro Cloud - Settings Modal
+        // HostProCloud (Server, SSL, SMTP, RBAC, Audit, Tenants)
         // ═══════════════════════════════════════════════
-        // PegaProx Settings Modal with User Management and Audit Log
-        function PegaProxSettingsModal({ isOpen, onClose, addToast, onGroupsChanged }) {
+        // HostPro Cloud Settings Modal with User Management and Audit Log
+        function HostProCloud({ isOpen, onClose, addToast, onGroupsChanged }) {
             const { t } = useTranslation();
             // haStandby: the saves below that no standby carries out, forwarding or not (#625)
             const { getAuthHeaders, user: currentUser, isAdmin, haStandby } = useAuth();
@@ -2856,7 +2856,7 @@
                 trusted_proxies: '',
                 proxy_bind_address: '',
                 logo_url: '',
-                app_name: 'PegaProx',
+                app_name: 'HostPro Cloud',
                 default_theme: 'proxmoxDark',  // NS: Default theme for new users - Jan 2026
                 login_background: '',
                 // NS: SMTP Settings - Dec 2025
@@ -2866,7 +2866,7 @@
                 smtp_user: '',
                 smtp_password: '',
                 smtp_from_email: '',
-                smtp_from_name: 'PegaProx Alerts',
+                smtp_from_name: 'HostPro Cloud Alerts',
                 smtp_tls: true,
                 smtp_ssl: false,
                 alert_email_recipients: [],
@@ -3154,7 +3154,7 @@
             
             // NS: Perform rollback - Jan 2026
             const performRollback = async (backupName) => {
-                if (!confirm(t('confirmRollback') || `This will restore PegaProx from backup "${backupName}". The server will restart. Continue?`)) return;
+                if (!confirm(t('confirmRollback') || `This will restore HostPro Cloud from backup "${backupName}". The server will restart. Continue?`)) return;
                 setUpdateLoading(true);
                 setUpdateProgress({ status: 'restoring', message: t('restoringBackup') || 'Restoring from backup...' });
                 try {
@@ -3708,7 +3708,7 @@
                             smtp_user: data.smtp_user || '',
                             smtp_password: data.smtp_password || '',
                             smtp_from_email: data.smtp_from_email || '',
-                            smtp_from_name: data.smtp_from_name || 'PegaProx Alerts',
+                            smtp_from_name: data.smtp_from_name || 'HostPro Cloud Alerts',
                             smtp_tls: data.smtp_tls !== false,
                             smtp_ssl: data.smtp_ssl || false,
                             // Alert settings
@@ -4147,7 +4147,7 @@
                             smtp_user: serverSettings.smtp_user || '',
                             smtp_password: serverSettings.smtp_password || '',
                             smtp_from_email: serverSettings.smtp_from_email,
-                            smtp_from_name: serverSettings.smtp_from_name || 'PegaProx Alerts',
+                            smtp_from_name: serverSettings.smtp_from_name || 'HostPro Cloud Alerts',
                             smtp_tls: serverSettings.smtp_tls !== false,
                             smtp_ssl: serverSettings.smtp_ssl || false
                         })
@@ -4559,7 +4559,7 @@
                                 <Icons.Settings className="w-5 h-5" style={{color:'var(--corp-accent, #49afd9)'}} />
                                 <div className="min-w-0">
                                     <div className="corp-vm-modal-title truncate">{t('pegaproxSettings')}</div>
-                                    <div className="corp-vm-modal-meta">PegaProx {PEGAPROX_VERSION}</div>
+                                    <div className="corp-vm-modal-meta">HostPro Cloud {PEGAPROX_VERSION}</div>
                                 </div>
                             </div>
                             <div className="corp-vm-modal-actions">
@@ -4578,7 +4578,7 @@
                                     <h2 className="text-xl font-bold text-white">
                                         {t('pegaproxSettings')}
                                     </h2>
-                                    <p className="text-sm text-gray-400">PegaProx {PEGAPROX_VERSION}</p>
+                                    <p className="text-sm text-gray-400">HostPro Cloud {PEGAPROX_VERSION}</p>
                                 </div>
                             </div>
                             <button onClick={onClose} className="p-1.5 hover:bg-proxmox-dark text-gray-400 hover:text-white">
@@ -7397,7 +7397,7 @@
                                                 <Icons.Plus className="w-3 h-3" /> Add Mapping
                                             </button>
                                         </div>
-                                        <p className="text-xs text-gray-500">Map AD/LDAP groups to PegaProx roles (including custom roles). Use full Distinguished Name (DN).</p>
+                                        <p className="text-xs text-gray-500">Map AD/LDAP groups to HostPro Cloud roles (including custom roles). Use full Distinguished Name (DN).</p>
                                         
                                         {ldapConfig.ldap_group_mappings.length === 0 ? (
                                             <p className="text-gray-600 text-sm text-center py-4 border border-dashed border-proxmox-border rounded-lg">No group mappings configured. Click "Add Mapping" to map an AD group to a role.</p>
@@ -7712,7 +7712,7 @@
                                                 <Icons.Plus className="w-3 h-3" /> Add Mapping
                                             </button>
                                         </div>
-                                        <p className="text-xs text-gray-500">{oidcConfig.oidc_provider === 'entra' ? 'Map Entra groups to PegaProx roles. Use group Object IDs (Azure Portal ↑ Groups ↑ Overview).' : 'Map provider groups to PegaProx roles (including custom roles).'}</p>
+                                        <p className="text-xs text-gray-500">{oidcConfig.oidc_provider === 'entra' ? 'Map Entra groups to HostPro Cloud roles. Use group Object IDs (Azure Portal ↑ Groups ↑ Overview).' : 'Map provider groups to HostPro Cloud roles (including custom roles).'}</p>
                                         
                                         {oidcConfig.oidc_group_mappings.length === 0 ? (
                                             <p className="text-gray-600 text-sm text-center py-4 border border-dashed border-proxmox-border rounded-lg">No group mappings configured. Click "Add Mapping" to map a group to a role.</p>
@@ -7834,7 +7834,7 @@
                                                     {t('syslogEnabled') || 'Syslog receiver'}
                                                 </h4>
                                                 <p className="text-sm text-gray-400 mt-1">
-                                                    {t('syslogEnabledDesc') || 'Listen for syslog messages on UDP/TCP port 1514. Disable to close the port if PegaProx does not ingest syslog from your nodes.'}
+                                                    {t('syslogEnabledDesc') || 'Listen for syslog messages on UDP/TCP port 1514. Disable to close the port if HostPro Cloud does not ingest syslog from your nodes.'}
                                                 </p>
                                             </div>
                                             <label className="flex items-center gap-2 cursor-pointer shrink-0">
@@ -8626,7 +8626,7 @@
                                                             type="text"
                                                             value={serverSettings.smtp_from_name}
                                                             onChange={e => setServerSettings({...serverSettings, smtp_from_name: e.target.value})}
-                                                            placeholder="PegaProx Alerts"
+                                                            placeholder="HostPro Cloud Alerts"
                                                             className="w-full px-3 py-2 bg-proxmox-darker border border-proxmox-border rounded-lg text-white text-sm"
                                                         />
                                                     </div>
@@ -8781,7 +8781,7 @@
                                                     onChange={e => setServerSettings({...serverSettings, alert_update_available: e.target.checked})}
                                                     className="w-4 h-4"
                                                 />
-                                                <span className="text-sm text-white">{t('alertUpdateAvailable') || 'Email me when a PegaProx update is available'}</span>
+                                                <span className="text-sm text-white">{t('alertUpdateAvailable') || 'Email me when a HostPro Cloud update is available'}</span>
                                             </label>
                                             <p className="text-xs text-gray-500 mt-1 ml-6">{t('alertUpdateAvailableDesc') || 'Polled once a day. Notifies once per new version to the recipients listed above.'}</p>
                                         </div>
@@ -8812,7 +8812,7 @@
                                         </div>
                                         <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
                                             <p className="text-xs text-yellow-400">
-                                                {t('pluginDisclaimer') || 'PegaProx takes no responsibility or liability for community plugins. Administrators should always review and scan plugin code before enabling. Only install plugins from trusted sources.'}
+                                                {t('pluginDisclaimer') || 'HostPro Cloud takes no responsibility or liability for community plugins. Administrators should always review and scan plugin code before enabling. Only install plugins from trusted sources.'}
                                             </p>
                                         </div>
                                         {discoveredPlugins.length === 0 ? (
@@ -9273,7 +9273,7 @@
                                 <BroadcastBannerSettings t={t} addToast={addToast} getAuthHeaders={getAuthHeaders} />
                             )}
 
-                            {/* LW Sep 2026 (#625) - warm standby for PegaProx itself */}
+                            {/* LW Sep 2026 (#625) - warm standby for HostPro Cloud itself */}
                             {activeTab === 'ha' && isAdmin && (
                                 <HaPanel t={t} addToast={addToast} getAuthHeaders={getAuthHeaders} />
                             )}
@@ -9296,7 +9296,7 @@
                                                 </h3>
                                                 <div className="mt-2 space-y-1">
                                                     <p className="text-2xl font-bold text-proxmox-orange">
-                                                        PegaProx {updateInfo?.current_version || PEGAPROX_VERSION}
+                                                        HostPro Cloud {updateInfo?.current_version || PEGAPROX_VERSION}
                                                     </p>
                                                     <p className="text-sm text-gray-400">
                                                         Build: {updateInfo?.current_build || '2026.01'}
@@ -9448,7 +9448,7 @@
                                             <Icons.CheckCircle className="w-12 h-12 text-green-400 mx-auto mb-3" />
                                             <h3 className="text-lg font-semibold text-white">You're up to date!</h3>
                                             <p className="text-gray-400 mt-1">
-                                                PegaProx {updateInfo.current_version} is the latest version.
+                                                HostPro Cloud {updateInfo.current_version} is the latest version.
                                             </p>
                                         </div>
                                     )}
@@ -9515,7 +9515,7 @@
                                     {/* GitHub Link */}
                                     <div className="text-center text-sm text-gray-500">
                                         <a 
-                                            href="https://github.com/PegaProx/project-pegaprox" 
+                                            href="https://github.com/HostPro Cloud/project-pegaprox" 
                                             target="_blank"
                                             rel="noopener noreferrer"
                                             className="hover:text-proxmox-orange transition-colors inline-flex items-center gap-1"
@@ -9610,7 +9610,7 @@
                                         </h3>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <a 
-                                                href="https://github.com/PegaProx/project-pegaprox/issues" 
+                                                href="https://github.com/HostPro Cloud/project-pegaprox/issues" 
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="flex items-center gap-3 p-4 bg-proxmox-darker rounded-lg hover:bg-proxmox-border/50 transition-colors"
@@ -9630,7 +9630,7 @@
                                                 an Issue" already covers the Q&A use case and Nico answers there.
                                                 If we ever turn Discussions on, restore from git history. */}
                                             <a
-                                                href="https://github.com/PegaProx/project-pegaprox/wiki"
+                                                href="https://github.com/HostPro Cloud/project-pegaprox/wiki"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="flex items-center gap-3 p-4 bg-proxmox-darker rounded-lg hover:bg-proxmox-border/50 transition-colors"
@@ -9645,7 +9645,7 @@
                                                 <Icons.ExternalLink className="w-4 h-4 text-gray-500 ml-auto" />
                                             </a>
                                             <a 
-                                                href="https://github.com/PegaProx/project-pegaprox/releases" 
+                                                href="https://github.com/HostPro Cloud/project-pegaprox/releases" 
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="flex items-center gap-3 p-4 bg-proxmox-darker rounded-lg hover:bg-proxmox-border/50 transition-colors"
@@ -9701,12 +9701,12 @@
                                     {/* Version Info */}
                                     <div className="bg-proxmox-dark border border-proxmox-border rounded-xl p-6 text-center">
                                         <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl mb-4">
-                                            <img src={getLogoSrc()} alt="PegaProx" className="w-20 h-20 object-contain" />
+                                            <img src={getLogoSrc()} alt="HostPro Cloud" className="w-20 h-20 object-contain" />
                                         </div>
-                                        <h2 className="text-3xl font-bold text-white">PegaProx</h2>
+                                        <h2 className="text-3xl font-bold text-white">HostPro Cloud</h2>
                                         <p className="text-xl text-proxmox-orange mt-1">{PEGAPROX_VERSION}</p>
                                         <p className="text-sm text-gray-400 mt-2">Multi-Cluster Proxmox Management</p>
-                                        <p className="text-xs text-gray-500 mt-1">© 2025-2026 PegaProx Team</p>
+                                        <p className="text-xs text-gray-500 mt-1">© 2025-2026 HostPro Team</p>
                                     </div>
                                     
                                     {/* Team */}
@@ -9807,7 +9807,7 @@
                                                     <div>
                                                         <h4 className="font-medium text-white">Community Translations</h4>
                                                         <p className="text-sm text-gray-400 mt-1">
-                                                            Thanks to community contributors for helping translate PegaProx into multiple languages.
+                                                            Thanks to community contributors for helping translate HostPro Cloud into multiple languages.
                                                         </p>
                                                         <div className="flex flex-wrap gap-2 mt-2 text-[12px]">
                                                             <a href="https://github.com/ColombianJoker" target="_blank" rel="noopener noreferrer"
@@ -9864,7 +9864,7 @@
                                                 <Icons.Globe className="text-proxmox-orange" />
                                                 <span className="text-sm text-gray-300">pegaprox.com</span>
                                             </a>
-                                            <a href="https://github.com/PegaProx/project-pegaprox" target="_blank" rel="noopener noreferrer"
+                                            <a href="https://github.com/HostPro Cloud/project-pegaprox" target="_blank" rel="noopener noreferrer"
                                                 className="flex items-center gap-2 p-3 bg-proxmox-darker rounded-lg hover:bg-proxmox-hover transition-colors">
                                                 <Icons.Github className="text-gray-400" />
                                                 <span className="text-sm text-gray-300">GitHub</span>
@@ -9902,12 +9902,12 @@
                                         attribution under AGPL-3.0 §7(b). English on purpose — it
                                         refers to an English-language license. NS Sep 2026 */}
                                     <div className="bg-proxmox-dark border border-proxmox-border rounded-xl p-6 text-sm text-gray-400 space-y-3">
-                                        <p className="text-gray-300 font-medium">© 2025-2026 PegaProx Team</p>
+                                        <p className="text-gray-300 font-medium">© 2025-2026 HostPro Team</p>
                                         <p>
-                                            PegaProx is free software: you can redistribute it and/or modify it
+                                            HostPro Cloud is free software: you can redistribute it and/or modify it
                                             under the terms of the GNU Affero General Public License, version 3,
                                             as published by the Free Software Foundation.{' '}
-                                            <a href="https://github.com/PegaProx/project-pegaprox/blob/main/LICENSE"
+                                            <a href="https://github.com/HostPro Cloud/project-pegaprox/blob/main/LICENSE"
                                                 target="_blank" rel="noopener noreferrer"
                                                 className="text-proxmox-orange hover:underline">Read the license</a>.
                                         </p>
@@ -9918,13 +9918,13 @@
                                             for details.
                                         </p>
                                         <p>
-                                            If you run a modified version of PegaProx and make it available to
+                                            If you run a modified version of HostPro Cloud and make it available to
                                             users over a network, section 13 of the license requires you to offer
                                             those users the complete source of your modified version.{' '}
-                                            <a href="https://github.com/PegaProx/project-pegaprox"
+                                            <a href="https://github.com/HostPro Cloud/project-pegaprox"
                                                 target="_blank" rel="noopener noreferrer"
                                                 className="text-proxmox-orange hover:underline">Source code</a>{' · '}
-                                            <a href="https://github.com/PegaProx/project-pegaprox/blob/main/NOTICE"
+                                            <a href="https://github.com/HostPro Cloud/project-pegaprox/blob/main/NOTICE"
                                                 target="_blank" rel="noopener noreferrer"
                                                 className="text-proxmox-orange hover:underline">NOTICE</a>
                                         </p>
@@ -10002,7 +10002,7 @@
         }
 
         // ═══════════════════════════════════════════════
-        // PegaProx - High Availability (#625)
+        // HostPro Cloud - High Availability (#625)
         // HaPanel (settings tab), HaRestartOverlay, haRelTime
         // v2: the live view switch and the restart a changed cluster setup needs
         // v3: groups of up to four - the members table, Remove, more standbys from the active
@@ -10150,7 +10150,7 @@
                 try {
                     const r = await fetch(`${API_URL}/ha/status`, { credentials: 'include', headers: getAuthHeaders() });
                     if (!r.ok) {
-                        setLoadError(await PegaProxApiErrors.message(r, t('pgHaLoadFailed')));
+                        setLoadError(await HostProCloud.message(r, t('pgHaLoadFailed')));
                         return;
                     }
                     const data = await r.json();
@@ -10234,7 +10234,7 @@
                 if (!r.ok) {
                     const code = (await r.clone().json().catch(() => null))?.code || '';
                     haLeaseRefused(r.status, code);
-                    return { ok: false, code, error: await PegaProxApiErrors.message(r, fallback || t('pgHaActionFailed')) };
+                    return { ok: false, code, error: await HostProCloud.message(r, fallback || t('pgHaActionFailed')) };
                 }
                 return { ok: true, data: await r.json().catch(() => ({})) };
             };
@@ -10384,7 +10384,7 @@
                 }
                 if (!r.ok) {
                     const code = (await r.clone().json().catch(() => null))?.code || '';
-                    const res = { code, error: await PegaProxApiErrors.message(r, t('haCopiesDownloadFailed')) };
+                    const res = { code, error: await HostProCloud.message(r, t('haCopiesDownloadFailed')) };
                     if (r.status === 404) {
                         // dismissed in the meantime, from another tab or by another admin
                         openCopy(null);

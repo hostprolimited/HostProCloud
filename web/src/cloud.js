@@ -1,5 +1,5 @@
         // ═══════════════════════════════════════════════
-        // PegaProx — Cloud console skin (Preview)
+        // HostPro Cloud — Cloud console skin (Preview)
         // Modern resource-first console: collapsible grouped nav, KPI dashboard,
         // data tables w/ bulk + per-row actions, full detail views with tabs.
         // self-contained: only React + global Icons + props passed from dashboard. -- LW
@@ -452,7 +452,7 @@
             return (
                 <nav className={'cloud-nav' + (collapsed ? ' cloud-nav-collapsed' : '')}>
                     <div className="cloud-nav-brand">
-                        {/* NS 2026-07: real PegaProx pegasus logo (was a generic Cloud icon).
+                        {/* NS 2026-07: real HostPro Cloud pegasus logo (was a generic Cloud icon).
                             Cloud-theme-aware: white pegasus on the dark shell, dark pegasus on
                             the light theme. Falls back to the Cloud icon if the asset 404s. */}
                         <span className="cloud-nav-brand-mark">
@@ -460,12 +460,12 @@
                                 src={(typeof document !== 'undefined' && document.body && document.body.dataset.cloudTheme === 'light')
                                     ? '/images/pegaprox-logo-light.png'
                                     : '/images/pegaprox-logo-dark.png'}
-                                alt="PegaProx"
+                                alt="HostPro Cloud"
                                 onError={(e) => { e.target.style.display = 'none'; const s = e.target.nextSibling; if (s) s.style.display = 'inline-flex'; }}
                             />
                             <span className="cloud-nav-brand-fallback" style={{ display: 'none' }}><Icons.Cloud /></span>
                         </span>
-                        {!collapsed && <span className="cloud-nav-brand-text">PegaProx</span>}
+                        {!collapsed && <span className="cloud-nav-brand-text">HostPro Cloud</span>}
                         {!collapsed && <span className="cloud-chip cloud-chip-preview">PREVIEW</span>}
                     </div>
                     <div className="cloud-nav-scroll">
@@ -1970,7 +1970,7 @@
                                     <div className="cloud-util-row"><span>{t('twoNodeMode') || '2-node mode'}</span><span>{sbp.two_node_mode ? 'Yes' : 'No'}</span></div>
                                     <div className="cloud-util-row"><span>{t('storageHeartbeat') || 'Storage heartbeat'}</span><span>{sbp.storage_heartbeat_enabled ? (sbp.storage_heartbeat_path || (t('enabled') || 'Enabled')) : (t('disabled') || 'Disabled')}</span></div>
                                     <div className="cloud-util-row"><span>{t('recoveryDelay') || 'Recovery delay'}</span><span>{sbp.recovery_delay != null ? sbp.recovery_delay + 's' : '—'}</span></div>
-                                    {sbp.pegaprox_vmid ? <div className="cloud-util-row"><span>PegaProx VM</span><span>#{sbp.pegaprox_vmid}</span></div> : null}
+                                    {sbp.pegaprox_vmid ? <div className="cloud-util-row"><span>HostPro Cloud VM</span><span>#{sbp.pegaprox_vmid}</span></div> : null}
                                 </div>
                             </div>
                         </React.Fragment>
@@ -1982,7 +1982,7 @@
         // LW Oct 2026 (#625) - the HA page of this layout shows the Proxmox HA groups
         // (ProxmoxHaSection, since aed792d CloudHA above is no longer mounted). What the
         // node HA settings of the cluster warn about gets one line each on top of it: an
-        // agent of an earlier PegaProx on a node, and unsafe two-node recovery. Nothing at
+        // agent of an earlier HostPro Cloud on a node, and unsafe two-node recovery. Nothing at
         // all when neither applies, or the server does not report them.
         function CloudHaNodeNotes({ clusterId, t, authFetch }) {
             const [ha, setHa] = React.useState(null);
@@ -2344,7 +2344,7 @@
             const { ha, haStandby, haConsolesElsewhere } = useAuth();
             const canAutoInstall = !!(currentUser && currentUser.autoinstall_access) && !haStandby;
 
-            // PegaProx t() ECHOES the key back on a miss, so `t('cloud.x') || 'Fallback'`
+            // HostPro Cloud t() ECHOES the key back on a miss, so `t('cloud.x') || 'Fallback'`
             // would render the raw key. treat key-echo as "no translation". -- NS
             const tx = React.useCallback((k) => {
                 const v = (typeof t === 'function') ? t(k) : undefined;
@@ -2601,10 +2601,10 @@
                         body = <CloudTasks tasks={tasks} t={T} />;
                         break;
                     case 'users':
-                        body = <CloudClassicLauncher title={T('cloud.users') || 'Users'} icon="Users" text={T('cloud.usersClassic') || 'User, group and ACL management is available in the classic PegaProx layout.'} onExit={onExitCloud} t={T} />;
+                        body = <CloudClassicLauncher title={T('cloud.users') || 'Users'} icon="Users" text={T('cloud.usersClassic') || 'User, group and ACL management is available in the classic HostPro Cloud layout.'} onExit={onExitCloud} t={T} />;
                         break;
                     case 'settings':
-                        body = <CloudClassicLauncher title={T('cloud.settings') || 'Settings'} icon="Settings" text={T('cloud.settingsClassic') || 'Full settings (auth, backups, monitoring, integrations) live in the classic PegaProx layout.'} onExit={onExitCloud} t={T} />;
+                        body = <CloudClassicLauncher title={T('cloud.settings') || 'Settings'} icon="Settings" text={T('cloud.settingsClassic') || 'Full settings (auth, backups, monitoring, integrations) live in the classic HostPro Cloud layout.'} onExit={onExitCloud} t={T} />;
                         break;
                     default:
                         body = <CloudDashboard clusters={safeClusters} resources={safeResources} metrics={clusterMetrics} dcStatus={dcStatus} tasks={tasks} onNav={selectSection} t={T} />;

@@ -1,5 +1,5 @@
 [Unit]
-Description=PegaProx - Proxmox Datacenter Manager for Proxmox VE
+Description=HostPro Cloud (PegaProx Engine) - Multi-Cluster Manager for Proxmox VE
 After=network-online.target
 Wants=network-online.target
 # MK #633: TLS bootstrap now fails closed (won't serve plaintext on the TLS port).

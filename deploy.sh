@@ -1,7 +1,7 @@
 #!/bin/bash
 # ============================================================================
-# PegaProx Deploy Script - All-in-One Installation v2.0
-# Downloads, installs, and starts PegaProx on any Linux system
+# HostPro Cloud Deploy Script - All-in-One Installation v2.0
+# Downloads, installs, and starts HostPro Cloud on any Linux system
 #
 # Usage: curl -sSL https://raw.githubusercontent.com/.../deploy.sh | sudo bash
 #    or: sudo ./deploy.sh
@@ -22,10 +22,10 @@ BOLD='\033[1m'
 NC='\033[0m'
 
 # Configuration
-INSTALL_DIR="/opt/PegaProx"
+INSTALL_DIR="/opt/HostProCloud"
 SERVICE_USER="pegaprox"
 SERVICE_GROUP="pegaprox"
-GITHUB_REPO="https://github.com/PegaProx/project-pegaprox.git"
+GITHUB_REPO="https://github.com/hostprolimited/HostProCloud.git"
 # MK May 2026 (#417 follow-up, elektronen): allow installing from a specific
 # branch via `PEGAPROX_BRANCH=Testing curl ... | sudo bash`. Default still main
 # so existing curl-pipe invocations don't change behaviour.
@@ -52,7 +52,7 @@ for arg in "$@"; do
             DOWNLOAD_OFFLINE=false
             ;;
         --help|-h)
-            echo "PegaProx Deploy Script"
+            echo "HostPro Cloud Deploy Script"
             echo ""
             echo "Usage: sudo ./deploy.sh [options]"
             echo ""
@@ -115,7 +115,7 @@ main() {
 
     # Check internet
     if ! ping -c 1 github.com &>/dev/null; then
-        print_error "No internet connection. Cannot download PegaProx."
+        print_error "No internet connection. Cannot download HostPro Cloud."
         exit 1
     fi
 
@@ -150,9 +150,9 @@ main() {
     print_success "Directory structure created"
 
     # =========================================================================
-    # Step 3: Download PegaProx from GitHub
+    # Step 3: Download HostPro Cloud from GitHub
     # =========================================================================
-    print_step "Step 3/6: Downloading PegaProx from GitHub"
+    print_step "Step 3/6: Downloading HostPro Cloud from GitHub"
 
     # NS: feb 2026 - detect if running from a checkout that already has the files
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" 2>/dev/null && pwd || echo "")"
@@ -242,7 +242,7 @@ main() {
     PY_MAJOR=$(echo "$PY_VER" | cut -d. -f1)
     PY_MINOR=$(echo "$PY_VER" | cut -d. -f2)
     if [ "$PY_MAJOR" -ne 3 ]; then
-        echo -e "${RED}Unsupported Python major version: $PY_VER. PegaProx requires Python 3.10–3.13.${NC}"
+        echo -e "${RED}Unsupported Python major version: $PY_VER. HostPro Cloud requires Python 3.10–3.13.${NC}"
         exit 1
     fi
     if [ "$PY_MINOR" -lt 10 ]; then
@@ -251,7 +251,7 @@ main() {
         exit 1
     fi
     if [ "$PY_MINOR" -ge 14 ]; then
-        echo -e "${YELLOW}WARNING: Python $PY_VER is newer than what PegaProx is tested on (3.10–3.13).${NC}"
+        echo -e "${YELLOW}WARNING: Python $PY_VER is newer than what HostPro Cloud is tested on (3.10–3.13).${NC}"
         echo -e "${YELLOW}Known issue on 3.14: SSH/VNC WebSocket subprocesses may fail to bind${NC}"
         echo -e "${YELLOW}cleanly (issue #388). If you hit a console-not-working bug, downgrade to${NC}"
         echo -e "${YELLOW}python3.12 (Ubuntu 24.04 default) or python3.13 and run deploy.sh again.${NC}"
@@ -355,7 +355,7 @@ main() {
     # Create systemd service
     cat > /etc/systemd/system/pegaprox.service << EOF
 [Unit]
-Description=PegaProx - Proxmox Cluster Management
+Description=HostPro Cloud - Proxmox Cluster Management
 After=network.target
 Wants=network-online.target
 
@@ -393,7 +393,7 @@ EOF
     # systemctl wrapper
     cat > "$INSTALL_DIR/bin/systemctl" << 'WRAPPEREOF'
 #!/bin/bash
-# Intelligent systemctl wrapper for PegaProx auto-update
+# Intelligent systemctl wrapper for HostPro Cloud auto-update
 if [ "$1" = "sudo" ]; then
     shift
 fi
@@ -421,7 +421,7 @@ SUDOWRAPPER
 
     # Create sudoers rules
     cat > /etc/sudoers.d/pegaprox << EOF
-# PegaProx service management (for auto-update)
+# HostPro Cloud service management (for auto-update)
 $SERVICE_USER ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart pegaprox
 $SERVICE_USER ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart pegaprox.service
 $SERVICE_USER ALL=(ALL) NOPASSWD: /usr/bin/systemctl stop pegaprox
@@ -469,7 +469,7 @@ EOF
         fi
     elif [ -f "$LEGACY_KEY" ]; then
         print_warning "Legacy key at $LEGACY_KEY detected"
-        print_info "  PegaProx will keep using it but emit a deprecation warning."
+        print_info "  HostPro Cloud will keep using it but emit a deprecation warning."
         print_info "  Migrate with:  sudo mv \"$LEGACY_KEY\" \"$SYS_KEY\" && sudo chmod 640 \"$SYS_KEY\" && sudo chown root:$SERVICE_GROUP \"$SYS_KEY\""
     else
         # No key anywhere — generate the new default at the secure location.
@@ -495,7 +495,7 @@ finally:
             print_info "  Loader tier: 4 (system-service default — outside $INSTALL_DIR/config)"
             print_info "  Stronger: wrap with systemd-creds — see docs/SECURITY.md §5"
         else
-            print_warning "Could not pre-generate $SYS_KEY — PegaProx will fall back to legacy path on first boot"
+            print_warning "Could not pre-generate $SYS_KEY — HostPro Cloud will fall back to legacy path on first boot"
         fi
     fi
 
@@ -527,9 +527,9 @@ finally:
 
     # Check if running
     if systemctl is-active --quiet pegaprox; then
-        print_success "PegaProx is running!"
+        print_success "HostPro Cloud is running!"
     else
-        print_error "PegaProx failed to start - check: journalctl -u pegaprox"
+        print_error "HostPro Cloud failed to start - check: journalctl -u pegaprox"
     fi
 
     # =========================================================================
@@ -556,7 +556,7 @@ finally:
     fi
 
     echo ""
-    echo -e "${YELLOW}💡 Tip: Check for updates in PegaProx Web UI${NC}"
+    echo -e "${YELLOW}💡 Tip: Check for updates in HostPro Cloud Web UI${NC}"
     echo -e "   Settings → Updates → Check for Updates"
     echo ""
     echo -e "Commands:"
