@@ -4055,8 +4055,8 @@ def get_vm_status_api(cluster_id, node, vm_type, vmid):
 
 
 # VM Control API Routes
-@bp.route('/api/clusters/<cluster_id>/vms/<node>/<vm_type>/<int:vmid>/<action>', methods=['POST'])
-@bp.route('/api/clusters/<cluster_id>/vms/<node>/<vm_type>/<int:vmid>/status/<action>', methods=['POST'])
+@bp.route('/api/clusters/<cluster_id>/vms/<node>/<vm_type>/<int:vmid>/<any(start,stop,shutdown,reboot,reset,suspend,resume):action>', methods=['POST'])
+@bp.route('/api/clusters/<cluster_id>/vms/<node>/<vm_type>/<int:vmid>/status/<any(start,stop,shutdown,reboot,reset,suspend,resume):action>', methods=['POST'])
 @require_auth()
 def vm_action_api(cluster_id, node, vm_type, vmid, action):
     """Perform action on VM (start, stop, shutdown, reboot, reset, suspend, resume)

@@ -13317,6 +13317,31 @@ echo "AGENT_INSTALLED_OK"
                 data.pop('skiplock', None)
                 resp = self._api_post(url, data=data if data else None)
 
+            if resp.status_code != 200:
+                # Fallback 1: Try alternate vm_type on same node
+                alt_type = 'lxc' if vm_type == 'qemu' else 'qemu'
+                alt_url = f"https://{host}:{self.api_port}/api2/json/nodes/{node}/{alt_type}/{vmid}/status/{action}"
+                alt_resp = self._api_post(alt_url, data=data if data else None)
+                if alt_resp.status_code == 200:
+                    resp = alt_resp
+                else:
+                    # Fallback 2: Locate VM/LXC across cluster resources
+                    try:
+                        resources = self.get_cluster_resources()
+                        items = resources.get('data', []) if isinstance(resources, dict) else (resources if isinstance(resources, list) else [])
+                        for r in items:
+                            if int(r.get('vmid', 0)) == int(vmid):
+                                real_node = r.get('node', node)
+                                real_type = r.get('type', vm_type)
+                                if real_type in ('qemu', 'lxc'):
+                                    real_url = f"https://{host}:{self.api_port}/api2/json/nodes/{real_node}/{real_type}/{vmid}/status/{action}"
+                                    real_resp = self._api_post(real_url, data=data if data else None)
+                                    if real_resp.status_code == 200:
+                                        resp = real_resp
+                                        break
+                    except Exception as res_err:
+                        self.logger.warning(f"[VM-ACTION] Resource fallback error: {res_err}")
+
             if resp.status_code == 200:
                 # #237: clear no-agent cache on start/reboot so agent gets re-checked
                 if action in ('start', 'reboot', 'reset'):
