@@ -1,7 +1,7 @@
 FROM python:3.12-slim@sha256:ddb0207ae1f0356c2b724d740769b0c5f5f51cc54a0525178f721825f78fe74c
 
 LABEL org.label-schema.name="PegaProx"
-LABEL org.label-schema.description="Modern Multi-Cluster Management for Proxmox VE"
+LABEL org.label-schema.description="Modern Multi-"
 LABEL org.label-schema.vendor="PegaProx"
 LABEL org.label-schema.url="https://pegaprox.com"
 LABEL org.label-schema.vcs-url="https://github.com/PegaProx/project-pegaprox"

@@ -1,5 +1,5 @@
         // ═══════════════════════════════════════════════
-        // HostPro Cloud - Dashboard & App
+        // Host Pro Cloud - Dashboard & App
         // TaskBar, Dashboard, App component, ReactDOM.render
         // ═══════════════════════════════════════════════
 
@@ -377,7 +377,7 @@
                                                 <th className="px-4 py-2 text-gray-400 font-medium">{t('startTime')}</th>
                                                 <th className="px-4 py-2 text-gray-400 font-medium">{t('endTime')}</th>
                                                 <th className="px-4 py-2 text-gray-400 font-medium">{t('node')}</th>
-                                                <th className="px-4 py-2 text-gray-400 font-medium" title={t('userColumnHint') || 'Shows HostPro Cloud user if available, otherwise Proxmox user'}>{t('user')}</th>
+                                                <th className="px-4 py-2 text-gray-400 font-medium" title={t('userColumnHint') || 'Shows Host Pro Cloud user if available, otherwise Proxmox user'}>{t('user')}</th>
                                                 <th className="px-4 py-2 text-gray-400 font-medium">{t('description')}</th>
                                                 <th className="px-4 py-2 text-gray-400 font-medium">{t('status')}</th>
                                             </tr>
@@ -418,7 +418,7 @@
                                                             {task.endtime ? fmtDate(task.endtime * 1000) : '-'}
                                                         </td>
                                                         <td className="px-4 py-2 text-white">{task.node || '-'}</td>
-                                                        <td className="px-4 py-2 text-gray-300" title={task.pegaprox_user ? `HostPro Cloud: ${task.pegaprox_user}\nProxmox: ${task.user || '-'}` : (task.user || '-')}>
+                                                        <td className="px-4 py-2 text-gray-300" title={task.pegaprox_user ? `Host Pro Cloud: ${task.pegaprox_user}\nProxmox: ${task.user || '-'}` : (task.user || '-')}>
                                                             {task.pegaprox_user || (task.user ? task.user.split('@')[0] : '-')}
                                                             {task.pegaprox_user && <span className="ml-1 text-proxmox-orange text-xs">●</span>}
                                                         </td>
@@ -2627,7 +2627,7 @@
                             <svg ref={svgRef}
                                 role="img"
                                 aria-label={isMultiCluster
-                                    ? `HostPro Cloud multi-cluster topology diagram (${frozenMultiCluster.length} clusters)`
+                                    ? `Host Pro Cloud multi-cluster topology diagram (${frozenMultiCluster.length} clusters)`
                                     : `Cluster topology for ${clusterName} — ${allNodes.length} node(s), ${totalGuests} guests`}
                                 viewBox={`${vbX.toFixed(1)} ${vbY.toFixed(1)} ${vbW.toFixed(1)} ${vbH.toFixed(1)}`}
                                 xmlns="http://www.w3.org/2000/svg"
@@ -2654,20 +2654,20 @@
                                                 strokeWidth={1.5} />
                                         ))}
 
-                                        {/* HostPro Cloud brand at top — bigger pill on Corporate */}
+                                        {/* Host Pro Cloud brand at top — bigger pill on Corporate */}
                                         {isCorporate ? (
                                             <React.Fragment>
                                                 <rect x={mcLayout.mcW / 2 - 110} y={MC_TIER.brand - 22}
                                                     width={220} height={42} rx={6}
                                                     fill={topoColor.section} stroke={topoColor.brand} strokeWidth={1.5} />
                                                 <text x={mcLayout.mcW / 2} y={MC_TIER.brand - 4} textAnchor="middle"
-                                                    fill={topoColor.brand} fontSize="16" fontWeight="700" letterSpacing="0.5">HostPro Cloud</text>
+                                                    fill={topoColor.brand} fontSize="16" fontWeight="700" letterSpacing="0.5">Host Pro Cloud</text>
                                                 <text x={mcLayout.mcW / 2} y={MC_TIER.brand + 12} textAnchor="middle"
                                                     fill={topoColor.muted} fontSize="9" letterSpacing="1">MULTI-CLUSTER TOPOLOGY</text>
                                             </React.Fragment>
                                         ) : (
                                             <React.Fragment>
-                                                <text x={mcLayout.mcW / 2} y={MC_TIER.brand} textAnchor="middle" fill={topoColor.brand} fontSize="16" fontWeight="700" letterSpacing="1.5">HostPro Cloud</text>
+                                                <text x={mcLayout.mcW / 2} y={MC_TIER.brand} textAnchor="middle" fill={topoColor.brand} fontSize="16" fontWeight="700" letterSpacing="1.5">Host Pro Cloud</text>
                                                 <text x={mcLayout.mcW / 2} y={MC_TIER.brand + 14} textAnchor="middle" fill={topoColor.muted} fontSize="9">Multi-Cluster Topology</text>
                                             </React.Fragment>
                                         )}
@@ -2894,19 +2894,19 @@
                                     );
                                 })}
 
-                                {/* HostPro Cloud branding — Corporate gets the pill style, Modern keeps the bold orange */}
+                                {/* Host Pro Cloud branding — Corporate gets the pill style, Modern keeps the bold orange */}
                                 {isCorporate ? (
                                     <React.Fragment>
                                         <rect x={clusterX - 80} y={10} width={160} height={34} rx={4}
                                             fill={topoColor.section} stroke={topoColor.brand} strokeWidth={1} />
                                         <text x={clusterX} y={26} textAnchor="middle"
-                                            fill={topoColor.brand} fontSize="14" fontWeight="600" letterSpacing="0.4">HostPro Cloud</text>
+                                            fill={topoColor.brand} fontSize="14" fontWeight="600" letterSpacing="0.4">Host Pro Cloud</text>
                                         <text x={clusterX} y={39} textAnchor="middle"
                                             fill={topoColor.muted} fontSize="9" letterSpacing="0.3">CLUSTER TOPOLOGY</text>
                                     </React.Fragment>
                                 ) : (
                                     <React.Fragment>
-                                        <text x={clusterX} y={28} textAnchor="middle" fill={topoColor.brand} fontSize="16" fontWeight="700" letterSpacing="1.5">HostPro Cloud</text>
+                                        <text x={clusterX} y={28} textAnchor="middle" fill={topoColor.brand} fontSize="16" fontWeight="700" letterSpacing="1.5">Host Pro Cloud</text>
                                         <text x={clusterX} y={42} textAnchor="middle" fill={topoColor.muted} fontSize="9">Cluster Topology</text>
                                     </React.Fragment>
                                 )}
@@ -3922,7 +3922,7 @@
         }
 
         // LW #430 — one place to see every replication job's health: local PVE jobs
-        // across all connected clusters + HostPro Cloud cross-cluster jobs, instead of
+        // across all connected clusters + Host Pro Cloud cross-cluster jobs, instead of
         // drilling into each VM. CSV + PDF export.
         function ReplicationOverviewTab({ clusters, authFetch, addToast, t }) {
             const [local, setLocal] = React.useState([]);
@@ -6388,7 +6388,7 @@
                                     </div>
                                 </div>
                                 <div className="bg-yellow-500/5 border border-yellow-500/20 rounded p-2 mt-4 text-[11px] text-yellow-300">
-                                    {t('templateDeployHint') || 'HostPro Cloud will SSH into the node, download the cloud image, create the VM and convert it to a template. This can take 1-3 minutes.'}
+                                    {t('templateDeployHint') || 'Host Pro Cloud will SSH into the node, download the cloud image, create the VM and convert it to a template. This can take 1-3 minutes.'}
                                 </div>
                                 <div className="flex justify-end gap-2 mt-4">
                                     <button onClick={() => setShowDeploy(null)} disabled={submitting}
@@ -7825,16 +7825,16 @@
                         [t('hardeningProfile') || 'Hardening profile', profileLabel],
                         [t('reportingPeriod') || 'Reporting period',   reportingPeriod],
                         [t('classification') || 'Classification',      t('classificationInternal') || 'Internal Use — Audit Working Paper'],
-                        [t('generatedBy') || 'Generated by',           (user?.username || user?.email || 'HostPro Cloud')],
+                        [t('generatedBy') || 'Generated by',           (user?.username || user?.email || 'Host Pro Cloud')],
                         // LW Sep 2026 - this read window.PEGAPROX_VERSION, but the constant is a
                         // plain `const` in constants.js and const does not become a window
                         // property. The lookup was always undefined, so every audit report ever
-                        // generated named the tool as "HostPro Cloud 0.9.x" - five releases out of
+                        // generated named the tool as "Host Pro Cloud 0.9.x" - five releases out of
                         // date, in a document people hand to auditors. The bare identifier is in
                         // scope here (same concatenated bundle, constants.js comes first); the
                         // typeof guard only exists so a future reordering degrades to a visibly
                         // unknown value instead of throwing and killing the whole export.
-                        [t('reportTool') || 'Report tool',             'HostPro Cloud ' + (typeof PEGAPROX_VERSION !== 'undefined' ? PEGAPROX_VERSION : 'version unknown')],
+                        [t('reportTool') || 'Report tool',             'Host Pro Cloud ' + (typeof PEGAPROX_VERSION !== 'undefined' ? PEGAPROX_VERSION : 'version unknown')],
                         [t('generatedAt') || 'Generated at',           isoTime],
                     ],
                 });
@@ -7925,7 +7925,7 @@
                     })
                     .join(' · ');
                 const controlSetSizeText =
-                    `${fw.controls.length} HostPro Cloud control${fw.controls.length !== 1 ? 's' : ''} in profile, ` +
+                    `${fw.controls.length} Host Pro Cloud control${fw.controls.length !== 1 ? 's' : ''} in profile, ` +
                     `mapped to ${allRefsForFw.size} ${fw.name} reference${allRefsForFw.size !== 1 ? 's' : ''}` +
                     (familySummary ? ` (${familySummary})` : '') +
                     `; ${overallChecked} data point${overallChecked !== 1 ? 's' : ''} evaluated across ${nodes.length} node${nodes.length !== 1 ? 's' : ''}`;
@@ -7958,7 +7958,7 @@
                             t('family') || 'Family',
                             t('familyName') || 'Name',
                             t('refsCovered') || 'References covered',
-                            t('pegaproxControls') || 'HostPro Cloud controls',
+                            t('pegaproxControls') || 'Host Pro Cloud controls',
                         ],
                         rows: Object.keys(refsByFamily).sort().map(fam => {
                             const refs = Array.from(refsByFamily[fam]).sort();
@@ -7984,7 +7984,7 @@
                         type: 'table',
                         title: (t('unmappedControls') || 'Controls without a direct framework mapping (informational)'),
                         columns: [
-                            t('pegaproxControl') || 'HostPro Cloud control',
+                            t('pegaproxControl') || 'Host Pro Cloud control',
                             t('description') || 'Description',
                             t('rationale') || 'Note',
                         ],
@@ -8056,7 +8056,7 @@
                         : `${familyCode} — ${label} (${passedCount}/${totalCtrls} ${t('fullySatisfied') || 'fully satisfied'})`;
                     blocks.push({
                         type: 'table', title: titleStr,
-                        columns: [t('ref') || 'Ref', t('controlTitle') || 'Control Title', t('severity') || 'Severity', t('pegaproxControl') || 'HostPro Cloud control', ...nodes],
+                        columns: [t('ref') || 'Ref', t('controlTitle') || 'Control Title', t('severity') || 'Severity', t('pegaproxControl') || 'Host Pro Cloud control', ...nodes],
                         rows: ctrls.map(ctrl => {
                             const refsStr = ctrl.refs.length ? ctrl.refs.map(r => r.ref).join('\n') : (t('noDirectMapping') || 'no direct mapping');
                             const titleStr2 = ctrl.refs.length ? ctrl.refs[0].title : ctrl.title;
@@ -8073,7 +8073,7 @@
                     blocks.push({
                         type: 'table',
                         title: `${t('appendixBRemediation') || 'Appendix B — Remediation Plan'} (${failedControls.length} ${failedControls.length === 1 ? (t('failedControl') || 'failed control') : (t('failedControls') || 'failed controls')})`,
-                        columns: [t('priority') || '#', t('severity') || 'Severity', t('timeline') || 'Timeline', t('ref') || 'Ref', t('controlTitle') || 'Title', t('pegaproxControl') || 'HostPro Cloud control', t('affectedNodes') || 'Affected Nodes', t('recommendedAction') || 'Recommended Action'],
+                        columns: [t('priority') || '#', t('severity') || 'Severity', t('timeline') || 'Timeline', t('ref') || 'Ref', t('controlTitle') || 'Title', t('pegaproxControl') || 'Host Pro Cloud control', t('affectedNodes') || 'Affected Nodes', t('recommendedAction') || 'Recommended Action'],
                         rows: failedControls.map((ctrl, i) => {
                             const refsStr = ctrl.refs.length ? ctrl.refs.map(r => r.ref).join(', ') : ctrl.cid;
                             const titleStr2 = ctrl.refs.length ? ctrl.refs[0].title : ctrl.title;
@@ -8082,14 +8082,14 @@
                             const rem = remediation[ctrl.cid];
                             const remStr = rem
                                 ? `${rem.summary}\n\n${t('howToFix') || 'How to fix'}: ${rem.how_to_fix}`
-                                : (t('useHardeningTool') || 'Use HostPro Cloud Hardening tool to apply') + ` "${ctrl.cid}".`;
+                                : (t('useHardeningTool') || 'Use Host Pro Cloud Hardening tool to apply') + ` "${ctrl.cid}".`;
                             return [String(i + 1), sevBadge(ctrl.severity), tl, refsStr, titleStr2, ctrl.cid, failNodes, remStr];
                         }),
                     });
                     // Operator-handoff hint — explicitly link the report back to the Hardening UI.
                     blocks.push({
                         type: 'text',
-                        value: t('hardeningUiHint') || 'Operator note: the values in the "HostPro Cloud control" column match the checkbox names in Settings → Compliance → Harden PVE Node. To remediate, select the failed control by that name and click "Apply Selected".',
+                        value: t('hardeningUiHint') || 'Operator note: the values in the "Host Pro Cloud control" column match the checkbox names in Settings → Compliance → Harden PVE Node. To remediate, select the failed control by that name and click "Apply Selected".',
                     });
                 }
 
@@ -8122,7 +8122,7 @@
                     blocks.push({
                         type: 'table',
                         title: `${t('appendixCEvidence') || 'Appendix C — Evidence'} (${evidenceRows.length} ${t('observations') || 'observations'})`,
-                        columns: [t('ref') || 'Ref', t('pegaproxControl') || 'HostPro Cloud control', t('node') || 'Node', t('checkCommand') || 'Check command', t('expected') || 'Expected', t('observed') || 'Observed'],
+                        columns: [t('ref') || 'Ref', t('pegaproxControl') || 'Host Pro Cloud control', t('node') || 'Node', t('checkCommand') || 'Check command', t('expected') || 'Expected', t('observed') || 'Observed'],
                         rows: evidenceRows,
                     });
                 }
@@ -8131,7 +8131,7 @@
                 // 10. Appendix D — Glossary (only terms relevant to this report)
                 // ──────────────────────────────────────────────────────────
                 const glossaryRows = [];
-                const baseTerms = ['HostPro Cloud', 'PVE', 'CIS', 'BSI', fw.region === 'EU' ? 'IT-Grundschutz' : 'STIG'];
+                const baseTerms = ['Host Pro Cloud', 'PVE', 'CIS', 'BSI', fw.region === 'EU' ? 'IT-Grundschutz' : 'STIG'];
                 const usedSlugs = new Set(baseTerms);
                 fw.controls.forEach(cid => {
                     const titleLow = (allTitles[cid] || cid).toLowerCase();
@@ -8168,7 +8168,7 @@
                 const dt = isoTime.slice(0, 10);
                 generateHostProCloud({
                     title:     `${fw.name} ${t('complianceReport') || 'Compliance Report'}`,
-                    subtitle:  c.name || 'HostPro Cloud',
+                    subtitle:  c.name || 'Host Pro Cloud',
                     clusterName: c.name,
                     filename:  `pegaprox-compliance-${fw.id}-${(c.id || 'cluster')}-${dt}.pdf`,
                     content:   blocks,
@@ -9596,7 +9596,7 @@
         }
 
         // Which self-fence agent each node runs, from the status, and what the agent check
-        // read on the nodes once it ran. An agent of an earlier HostPro Cloud keeps running as it
+        // read on the nodes once it ran. An agent of an earlier Host Pro Cloud keeps running as it
         // is: the install above replaces it.
         function HaNodeAgents({ t, clusterId, status, check, onCheck, authFetch, onReload, locked }) {
             const [checking, setChecking] = useState(false);
@@ -9613,7 +9613,7 @@
                 ...(Array.isArray(status.self_fence_nodes) ? status.self_fence_nodes : []),
                 ...Object.keys(found || {}),
             ])).sort();
-            // the agents ask the HostPro Cloud instances only where quorum cannot decide
+            // the agents ask the Host Pro Cloud instances only where quorum cannot decide
             const asks = Array.isArray(check?.members) && check.members.length > 0;
             const outdatedText = fa.outdated_warning || check?.outdated_warning;
 
@@ -9835,7 +9835,7 @@
             );
         }
 
-        // How HostPro Cloud powers a failed node off: one row per node. The BMC password is never
+        // How Host Pro Cloud powers a failed node off: one row per node. The BMC password is never
         // sent back by the server, so its field only writes; left empty, the stored one stays.
         function HaNodeFencing({ t, clusterId, status, nodeNames, authFetch, addToast, onStatus, locked }) {
             const [draft, setDraft] = useState({});           // node -> {type, host, user, password}, what was touched
@@ -12611,7 +12611,7 @@
 
             // NS May 2026 (#387): when the user enters the Logs subtab while a specific
             // node is in scope (sidebar selection), auto-populate the hostname filter
-            // so they see only that node's syslog instead of every host HostPro Cloud ingests.
+            // so they see only that node's syslog instead of every host Host Pro Cloud ingests.
             // User can clear / change the filter in the UI if they want the wider view.
             useEffect(() => {
                 if (resourcesSubTab !== 'logs') return;
@@ -13161,7 +13161,7 @@
                 if (!selectedCluster?.id || !hardenNode) return;
                 const toRoll = Object.keys(hardenSelected).filter(k => hardenSelected[k]);
                 if (!toRoll.length) { addToast(t('noControlsSelected') || 'No controls selected', 'warning'); return; }
-                if (!confirm(t('hardenRollbackConfirm') || `↩️ Restore ${toRoll.length} control(s) on "${hardenNode}" to their pre-apply state?\n\nOnly controls applied through HostPro Cloud (with a saved snapshot) can be rolled back.`)) return;
+                if (!confirm(t('hardenRollbackConfirm') || `↩️ Restore ${toRoll.length} control(s) on "${hardenNode}" to their pre-apply state?\n\nOnly controls applied through Host Pro Cloud (with a saved snapshot) can be rolled back.`)) return;
                 setHardenApplying(true);
                 try {
                     const resp = await authFetch(`${API_URL}/clusters/${selectedCluster.id}/nodes/${hardenNode}/hardening/rollback`, {
@@ -14086,7 +14086,7 @@
 
             // MK Apr 2026: #273 — PBS Reports fetchers
             // NS May 2026 — vm-name lookup for PBS views. PBS only stores VMID,
-            // HostPro Cloud knows the names from the linked PVE clusters. Memoised by
+            // Host Pro Cloud knows the names from the linked PVE clusters. Memoised by
             // the dependency triple (linked clusters of selected PBS, plus the
             // cached guests-per-cluster map). Returns name or '' (never undefined).
             const pbsVmNameLookup = React.useMemo(() => {
@@ -16968,10 +16968,10 @@
                                 >
 
                                     {isCorporate ? (
-                                        <span className="text-[13px] font-semibold">HostPro Cloud</span>
+                                        <span className="text-[13px] font-semibold">Host Pro Cloud</span>
                                     ) : (
                                         <div className="text-left">
-                                            <h1 className="text-xl font-bold">HostPro Cloud</h1>
+                                            <h1 className="text-xl font-bold">Host Pro Cloud</h1>
                                             <p className="text-xs text-gray-500">{t('clusterManagement')}</p>
                                         </div>
                                     )}
@@ -19978,7 +19978,7 @@
                                                                 value={hardenProfile}
                                                                 onChange={e => { setHardenProfile(e.target.value); setHardenStatus(null); setHardenSelected({}); }}
                                                                 className="bg-proxmox-dark border border-proxmox-border rounded-lg px-3 py-2 text-sm"
-                                                                title={t('hardenProfileHint') || 'Filter controls by compliance framework. All controls = full CIS+Lynis+STIG+HostPro Cloud set.'}>
+                                                                title={t('hardenProfileHint') || 'Filter controls by compliance framework. All controls = full CIS+Lynis+STIG+Host Pro Cloud set.'}>
                                                                 <option value="">{t('hardenProfileAll') || 'All controls'}</option>
                                                                 <optgroup label={t('regionEU') || 'EU / DACH'}>
                                                                     <option value="bsi">BSI IT-Grundschutz</option>
@@ -20062,7 +20062,7 @@
                                                                 mem_protection: { ref: 'Kernel', title: t('stigMemProt') || 'Memory Protection - Kernel Hardening', desc: t('stigMemProtDesc') || 'Kernel parameters: init_on_alloc=1, init_on_free=1, page_alloc.shuffle=1, slab_nomerge. Prevents info leaks and use-after-free attacks.', impact: t('stigMemProtImpact') || '~1-3% performance overhead. Reboot required.', reboot: true },
                                                                 audit_immutable: { ref: 'V-270832', title: t('stigAuditLock') || 'Audit Rules Immutable', desc: t('stigAuditLockDesc') || 'Locks audit configuration with -e 2 flag. Rules cannot be modified without reboot, preventing attackers from disabling auditing.', impact: t('stigAuditLockImpact') || 'Audit rule changes require reboot' },
                                                             };
-                                                            // HostPro Cloud recommendations
+                                                            // Host Pro Cloud recommendations
                                                             const pegaControls = {
                                                                 apparmor: { ref: 'MAC', title: t('pegaApparmor') || 'AppArmor (Mandatory Access Control)', desc: t('pegaApparmorDesc') || 'Enables AppArmor and enforces all profiles. Restricts what programs can access even if compromised — adds a security layer beyond standard file permissions.', impact: t('pegaApparmorImpact') || 'None for standard PVE — custom services may need profiles' },
                                                                 disable_services: { ref: 'SVC', title: t('pegaDisableSvc') || 'Disable Unnecessary Services', desc: t('pegaDisableSvcDesc') || 'Stops and disables bluetooth, CUPS (printing), and Avahi (mDNS). Fewer running services means less attack surface.', impact: t('pegaDisableSvcImpact') || 'No local printing or Bluetooth — irrelevant for servers' },
@@ -20145,7 +20145,7 @@
                                                                         </div>
                                                                         <div className="flex-1 min-w-0">
                                                                             <div className="flex items-center gap-2 flex-wrap">
-                                                                                <span className={`text-xs font-mono px-1.5 py-0.5 rounded ${source === 'cis' ? 'text-blue-400 bg-blue-500/10' : source === 'lynis' ? 'text-purple-400 bg-purple-500/10' : source === 'pega' ? 'text-orange-400 bg-orange-500/10' : 'text-amber-400 bg-amber-500/10'}`}>{source === 'cis' ? 'CIS' : source === 'lynis' ? 'Lynis' : source === 'pega' ? 'HostPro Cloud' : 'STIG'} {info.ref}</span>
+                                                                                <span className={`text-xs font-mono px-1.5 py-0.5 rounded ${source === 'cis' ? 'text-blue-400 bg-blue-500/10' : source === 'lynis' ? 'text-purple-400 bg-purple-500/10' : source === 'pega' ? 'text-orange-400 bg-orange-500/10' : 'text-amber-400 bg-amber-500/10'}`}>{source === 'cis' ? 'CIS' : source === 'lynis' ? 'Lynis' : source === 'pega' ? 'Host Pro Cloud' : 'STIG'} {info.ref}</span>
                                                                                 <span className="text-sm font-medium text-white">{info.title}</span>
                                                                                 {applied && <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded">{t('applied') || 'Applied'}</span>}
                                                                                 {applied && info.reboot && <span className="text-xs bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded font-semibold">{t('rebootRequired') || 'Reboot required'}</span>}
@@ -20157,7 +20157,7 @@
                                                                             {id === 'default_umask' && (
                                                                                 <p className="text-[11px] text-yellow-400/80 mt-1 leading-tight">⚠ {t('cmUmaskToolingNote')}</p>
                                                                             )}
-                                                                            {/* MK #16745: this cluster is reached by password with no key -> sshd_hardening (prohibit-password) would cut off HostPro Cloud's OWN root SSH, and the rollback needs SSH too. Warn before apply. */}
+                                                                            {/* MK #16745: this cluster is reached by password with no key -> sshd_hardening (prohibit-password) would cut off Host Pro Cloud's OWN root SSH, and the rollback needs SSH too. Warn before apply. */}
                                                                             {id === 'sshd_hardening' && selectedCluster && selectedCluster.has_ssh_key === false && !applied && (
                                                                                 <p className="text-[11px] text-red-400/90 mt-1 leading-tight">⚠ {t('cmSshdRootLockoutNote')}</p>
                                                                             )}
@@ -20256,7 +20256,7 @@
                                                                     { name: 'CIS Debian Linux 13 Benchmark', ctrls: cisControls, src: 'cis' },
                                                                     { name: 'Lynis Security Auditing', ctrls: lynisControls, src: 'lynis' },
                                                                     { name: 'STIG — DoD Security Technical Implementation Guide', ctrls: stigControls, src: 'stig' },
-                                                                    { name: 'HostPro Cloud ' + (t('recommendations') || 'Recommendations'), ctrls: pegaControls, src: 'pega' },
+                                                                    { name: 'Host Pro Cloud ' + (t('recommendations') || 'Recommendations'), ctrls: pegaControls, src: 'pega' },
                                                                     { name: 'VS-NfD / BSI Grundschutz (' + (t('informational') || 'informational') + ')', ctrls: vsnfdControls, src: 'vsnfd' },
                                                                 ];
                                                                 const statusLbl = (applied, failed) => failed ? (t('failed') || 'Failed') : applied ? (t('applied') || 'Applied') : (t('notApplied') || 'Not applied');
@@ -20351,7 +20351,7 @@
                                                                     <button
                                                                         onClick={rollbackHardening}
                                                                         disabled={hardenApplying || selectedCount === 0}
-                                                                        title={t('hardenRollbackHint') || 'Restore the selected controls to their pre-apply state (only controls applied via HostPro Cloud)'}
+                                                                        title={t('hardenRollbackHint') || 'Restore the selected controls to their pre-apply state (only controls applied via Host Pro Cloud)'}
                                                                         className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 whitespace-nowrap ${
                                                                             hardenApplying || selectedCount === 0 ? 'bg-gray-700 text-gray-500 cursor-not-allowed' : 'bg-amber-600 hover:bg-amber-500 text-white'
                                                                         }`}
@@ -20372,7 +20372,7 @@
                                                                                     <p className="text-xs text-red-300 mb-2 leading-snug">⚠ {t('cmSshdRootLockoutNote')}</p>
                                                                                     <label className="flex items-start gap-2 text-xs text-red-200 cursor-pointer">
                                                                                         <input type="checkbox" checked={hardenLockoutAck} onChange={e => setHardenLockoutAck(e.target.checked)} className="mt-0.5 accent-red-500" />
-                                                                                        <span>{t('hardenLockoutAck') || "I understand this cuts off HostPro Cloud's own password access to this cluster, and I have console / manual access to recover."}</span>
+                                                                                        <span>{t('hardenLockoutAck') || "I understand this cuts off Host Pro Cloud's own password access to this cluster, and I have console / manual access to recover."}</span>
                                                                                     </label>
                                                                                 </div>
                                                                             )}
@@ -20437,12 +20437,12 @@
                                                                 </div>
                                                                 )}
 
-                                                                {/* HostPro Cloud Recommendations section */}
+                                                                {/* Host Pro Cloud Recommendations section */}
                                                                 {Object.entries(pegaControls).some(([id]) => id in controls) && (
                                                                 <div>
                                                                     <h3 className="text-sm font-semibold text-orange-400 mb-2 flex items-center gap-2">
                                                                         <Icons.Zap className="w-4 h-4" />
-                                                                        HostPro Cloud {t('recommendations') || 'Recommendations'}
+                                                                        Host Pro Cloud {t('recommendations') || 'Recommendations'}
                                                                     </h3>
                                                                     <div className="space-y-2">
                                                                         {Object.entries(pegaControls).filter(([id]) => id in controls).map(([id, info]) => renderControl(id, info, 'pega'))}
@@ -20487,7 +20487,7 @@
                                                             <div className="text-center py-16">
                                                                 <Icons.Shield className="w-16 h-16 text-gray-700 mx-auto mb-4" />
                                                                 <p className="text-gray-400 mb-2">{t('hardenEmpty') || 'Select a node and click "Check Status"'}</p>
-                                                                <p className="text-gray-600 text-sm">{t('hardenEmptyDesc') || 'HostPro Cloud checks which CIS controls are already applied and lets you enable the remaining ones.'}</p>
+                                                                <p className="text-gray-600 text-sm">{t('hardenEmptyDesc') || 'Host Pro Cloud checks which CIS controls are already applied and lets you enable the remaining ones.'}</p>
                                                             </div>
                                                         )}
                                                     </div>
@@ -25366,7 +25366,7 @@
                                         </div>
                                         <div className="p-2">
                                             <TopologyView
-                                                clusterName="HostPro Cloud"
+                                                clusterName="Host Pro Cloud"
                                                 multiCluster={clusters.filter(c => c.connected).map(cluster => {
                                                     const metrics = sidebarClusterData[cluster.id]?.metrics || {};
                                                     let nodes = Object.entries(metrics)
@@ -25936,7 +25936,7 @@
                                             {pbsForm._showSsh && (
                                                 <div className="mt-3 space-y-3 p-3 bg-proxmox-dark/50 rounded-lg">
                                                     <p className="text-xs text-gray-400">
-                                                        {t('pbsSshHint') || 'SSH is only used for the Update Manager (apt dist-upgrade). If left blank, HostPro Cloud falls back to the PBS web password. Use a dedicated key if your PBS has password-login disabled.'}
+                                                        {t('pbsSshHint') || 'SSH is only used for the Update Manager (apt dist-upgrade). If left blank, Host Pro Cloud falls back to the PBS web password. Use a dedicated key if your PBS has password-login disabled.'}
                                                     </p>
                                                     <div className="grid grid-cols-2 gap-2">
                                                         <div>
@@ -26608,7 +26608,7 @@
                                                 </div>
                                             )}
 
-                                            {/* the install is also how an agent of an earlier HostPro Cloud is replaced,
+                                            {/* the install is also how an agent of an earlier Host Pro Cloud is replaced,
                                                 and how what the agent check found is put right (#625) */}
                                             {(() => {
                                                 const fa = haStatus?.fence_agent;
@@ -26637,7 +26637,7 @@
                                                 ✓ {t('noSharedStorageNeeded')} • ✓ {t('worksWithLvmIscsi')}
                                             </div>
 
-                                            {/* HostPro Cloud VM Auto-Recovery */}
+                                            {/* Host Pro Cloud VM Auto-Recovery */}
                                             {haStatus?.self_fence_installed && (
                                                 <div className="mt-3 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
                                                     <label className="block text-sm text-blue-400 font-medium mb-1">
@@ -26888,7 +26888,7 @@
                                 </div>
                             )}
                             <div className="corp-status-bar-item" style={{borderRight: 'none'}}>
-                                HostPro Cloud {PEGAPROX_VERSION}
+                                Host Pro Cloud {PEGAPROX_VERSION}
                             </div>
                         </div>
                     )}
@@ -27674,7 +27674,7 @@
                                             name="content" 
                                             required 
                                             rows={12}
-                                            defaultValue={editingScript?.content || (editingScript?.type === 'python' ? '#!/usr/bin/env python3\n# Your script here\n\nprint("Hello from HostPro Cloud!")' : '#!/bin/bash\n# Your script here\n\necho "Hello from HostPro Cloud!"')}
+                                            defaultValue={editingScript?.content || (editingScript?.type === 'python' ? '#!/usr/bin/env python3\n# Your script here\n\nprint("Hello from Host Pro Cloud!")' : '#!/bin/bash\n# Your script here\n\necho "Hello from Host Pro Cloud!"')}
                                             placeholder="#!/bin/bash"
                                             className="w-full px-3 py-2 bg-proxmox-dark border border-proxmox-border rounded-lg font-mono text-sm"
                                         />
@@ -27757,7 +27757,7 @@
                         addToast={addToast}
                     />
 
-                    {/* HostPro Cloud Settings Modal */}
+                    {/* Host Pro Cloud Settings Modal */}
                     <HostProCloud
                         isOpen={showSettings}
                         onClose={() => setShowSettings(false)}
@@ -28139,7 +28139,7 @@
                                         </div>
                                     ) : (
                                         <>
-                                        <p className="text-xs text-gray-500 mb-4">{t('reconfigureHint') || 'Enter your HostPro Cloud password to verify your identity.'}</p>
+                                        <p className="text-xs text-gray-500 mb-4">{t('reconfigureHint') || 'Enter your Host Pro Cloud password to verify your identity.'}</p>
                                         <input
                                             type="password"
                                             value={reconfigurePassword}
@@ -28249,10 +28249,10 @@
                                         <Icons.Heart className="w-8 h-8 text-pink-400" />
                                     </div>
                                     <h2 style={{fontSize: 24, fontWeight: 700, color: '#fff', marginBottom: 12, lineHeight: 1.2}}>
-                                        {t('sponsorNagTitle') || 'Help keep HostPro Cloud alive'}
+                                        {t('sponsorNagTitle') || 'Help keep Host Pro Cloud alive'}
                                     </h2>
                                     <p style={{fontSize: 14, color: '#cbd5e1', lineHeight: 1.6}}>
-                                        {t('sponsorNagBody') || 'HostPro Cloud is a passion project — we pay for the servers, domains and all those dev hours out of our own pockets. If this tool saves you time and you can spare a bit, we would be incredibly grateful for a tip on Open Collective. Every contribution, big or small, keeps the lights on!'}
+                                        {t('sponsorNagBody') || 'Host Pro Cloud is a passion project — we pay for the servers, domains and all those dev hours out of our own pockets. If this tool saves you time and you can spare a bit, we would be incredibly grateful for a tip on Open Collective. Every contribution, big or small, keeps the lights on!'}
                                     </p>
                                 </div>
                                 <div style={{padding: '0 28px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14}}>
@@ -28670,7 +28670,7 @@
                             status: 'ready', clusterId, vm,
                             info: { vmid: Number(vmid), node, type, host: cluster.host },
                         });
-                        document.title = `${label} — HostPro Cloud`;
+                        document.title = `${label} — Host Pro Cloud`;
                         // The header hides the vmid as soon as it has a name, so the name has to
                         // come from the cluster and not from the link — otherwise whoever writes
                         // the link chooses the label on someone else's root console. One small
@@ -28687,7 +28687,7 @@
                                 if (real) {
                                     setState(prev => prev.vm
                                         ? { ...prev, vm: { ...prev.vm, name: real } } : prev);
-                                    document.title = `${real} — HostPro Cloud`;
+                                    document.title = `${real} — Host Pro Cloud`;
                                 }
                             }
                         } catch (_) { /* label stays the vmid */ }

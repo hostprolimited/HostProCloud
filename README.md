@@ -2,20 +2,20 @@
   <picture>
     <!-- GitHub dark mode → swap to light variant so it stays readable -->
     <source media="(prefers-color-scheme: dark)" srcset="images/pegaprox-logo-light.png">
-    <img src="images/pegaprox-logo-dark.png" alt="HostPro Cloud Logo" width="220"/>
+    <img src="images/pegaprox-logo-dark.png" alt="Host Pro Cloud Logo" width="220"/>
   </picture>
 </p>
 
-<h1 align="center">HostPro Cloud</h1>
+<h1 align="center">Host Pro Cloud</h1>
 
 <p align="center">
-  <strong>Modern Multi-Cluster Management for Proxmox VE & XCP-ng</strong>
+  <strong>Modern Multi- & XCP-ng</strong>
 </p>
 
 <p align="center">
   <a href="https://pegaprox.com">Website</a> •
   <a href="https://docs.pegaprox.com">Documentation</a> •
-  <a href="https://github.com/HostPro Cloud/project-pegaprox/releases">Releases</a> •
+  <a href="https://github.com/Host Pro Cloud/project-pegaprox/releases">Releases</a> •
   <a href="https://plugins.pegaprox.com/">Plugins</a> •
   <a href="https://opencollective.com/pegaprox">Sponsoring</a> •
   <a href="https://pegaprox.com/sponsors.html">Commercial Support</a>
@@ -34,9 +34,9 @@
 </p>
 ---
 
-## 🚀 What is HostPro Cloud?
+## 🚀 What is Host Pro Cloud?
 
-HostPro Cloud is a powerful web-based management interface for Proxmox VE and XCP-ng clusters. Manage multiple clusters from a single dashboard with features like live monitoring, VM management, automated tasks, and more.
+Host Pro Cloud is a powerful web-based management interface for Proxmox VE and XCP-ng clusters. Manage multiple clusters from a single dashboard with features like live monitoring, VM management, automated tasks, and more.
 
 <p align="center">
   <img src="https://pegaprox.com/pictures/pegaprox.png" alt="Dashboard Screenshot" width="800"/>
@@ -44,11 +44,11 @@ HostPro Cloud is a powerful web-based management interface for Proxmox VE and XC
 
 ### ☁️ Enterprise Cloud Infrastructure
 
-**HostPro Cloud** is an enterprise-grade multi-cluster hypervisor management platform designed for hosting providers, ISPs, and modern cloud infrastructure teams. Built for seamless Proxmox VE orchestration, live cluster metrics, automated provisioning, and multi-tenant management.
+**Host Pro Cloud** is an enterprise-grade multi-cluster hypervisor management platform designed for hosting providers, ISPs, and modern cloud infrastructure teams. Built for seamless Proxmox VE orchestration, live cluster metrics, automated provisioning, and multi-tenant management.
 
 ## ❤️ Sponsors
 
-> HostPro Cloud is a community-driven open source project that **lives entirely from sponsorships and donations**. Server costs, domains, code-signing certificates and the developer hours behind every release come straight out of our own pockets — and out of the contributions of the wonderful companies and individuals below. If HostPro Cloud saves you time at work, please consider [becoming a sponsor](mailto:sponsor@pegaprox.com) or chipping in on [Open Collective](https://opencollective.com/pegaprox). Every euro keeps the lights on. 💛
+> Host Pro Cloud is a community-driven open source project that **lives entirely from sponsorships and donations**. Server costs, domains, code-signing certificates and the developer hours behind every release come straight out of our own pockets — and out of the contributions of the wonderful companies and individuals below. If Host Pro Cloud saves you time at work, please consider [becoming a sponsor](mailto:sponsor@pegaprox.com) or chipping in on [Open Collective](https://opencollective.com/pegaprox). Every euro keeps the lights on. 💛
 
 ### 💎 Platinum
 
@@ -190,7 +190,7 @@ HostPro Cloud is a powerful web-based management interface for Proxmox VE and XC
 - 🚑 **Site Recovery** - Configure DR plans (boot order, dependencies, replication mappings) and execute controlled failover with audit trail.
 - 📦 **Backup SLA Tracking** - SLA dashboard per cluster + datastore: last-backup age vs configured RPO, integrated with the Alert pipeline.
 - 🔁 **ZFS / Cross-Cluster Replication** - Native PVE replication monitor + cross-cluster replication for clusters without shared storage.
-- 🪽 **HostPro Cloud High Availability** - Pair up to 4 HostPro Cloud instances: standbys keep a copy of the configuration, show a live view and pass changes on to the leader; failover is a confirmed, manual promote
+- 🪽 **Host Pro Cloud High Availability** - Pair up to 4 Host Pro Cloud instances: standbys keep a copy of the configuration, show a live view and pass changes on to the leader; failover is a confirmed, manual promote
 - 🧩 **Automated PVE Installations** - Serve answer files for the Proxmox VE auto-installer from profiles (guided setup or editor) and follow every installation run
 - 🛠️ **V2P / ESXi Migration** - Pyvmomi + SSHFS-based, with VirtIO driver pre-staging via MSI bulk-install (Windows guests).
 
@@ -225,16 +225,16 @@ HostPro Cloud is a powerful web-based management interface for Proxmox VE and XC
 ## ⚡ Quick Start / Installation
 
 ### Automated Installation
-This installation method pulls the deployment script directly from the current HEAD of the main branch. This means you will always receive the latest available version, including the most recent features and improvements. However, because it is not tied to a specific release, it may also contain unreleased changes or bugs that have not yet been fully tested. If you prefer a stable and tested version, consider installing HostPro Cloud from a tagged release instead.
+This installation method pulls the deployment script directly from the current HEAD of the main branch. This means you will always receive the latest available version, including the most recent features and improvements. However, because it is not tied to a specific release, it may also contain unreleased changes or bugs that have not yet been fully tested. If you prefer a stable and tested version, consider installing Host Pro Cloud from a tagged release instead.
 
 ```bash
-curl -O https://raw.githubusercontent.com/HostPro Cloud/project-pegaprox/refs/heads/main/deploy.sh
+curl -O https://raw.githubusercontent.com/Host Pro Cloud/project-pegaprox/refs/heads/main/deploy.sh
 chmod +x deploy.sh
 sudo ./deploy.sh
 ```
 
 ### Debian Repository
-This installation method uses the official APT repository provided by gyptazy. The repository and its associated build and packaging pipeline are fully hosted and maintained by <a href="https://github.com/gyptazy">gyptazy</a>, where HostPro Cloud releases are automatically built and published as Debian packages. Unlike the automated installation script, which pulls the latest code directly from the repository branch, the APT repository distributes packaged and versioned releases. This generally provides a more stable and predictable installation, making it the recommended approach for production environments.
+This installation method uses the official APT repository provided by gyptazy. The repository and its associated build and packaging pipeline are fully hosted and maintained by <a href="https://github.com/gyptazy">gyptazy</a>, where Host Pro Cloud releases are automatically built and published as Debian packages. Unlike the automated installation script, which pulls the latest code directly from the repository branch, the APT repository distributes packaged and versioned releases. This generally provides a more stable and predictable installation, making it the recommended approach for production environments.
 ```bash
 curl https://git.gyptazy.com/api/packages/gyptazy/debian/repository.key -o /etc/apt/keyrings/gyptazy.asc
 echo "deb [signed-by=/etc/apt/keyrings/gyptazy.asc] https://packages.gyptazy.com/api/packages/gyptazy/debian trixie main" | sudo tee -a /etc/apt/sources.list.d/gyptazy.list
@@ -244,16 +244,16 @@ apt-get -y install pegaprox
 ```
 
 ## Installation from Source
-This installation methods run HostPro Cloud directly from the source code repository. It is primarily intended for development, testing, or advanced users who want full control over the codebase or want to modify and extend the project.
+This installation methods run Host Pro Cloud directly from the source code repository. It is primarily intended for development, testing, or advanced users who want full control over the codebase or want to modify and extend the project.
 
 By default, cloning the repository will pull the latest state of the main branch, which contains the most recent changes and features. While this ensures you always have the newest code available, it may also include in-progress changes that are not part of an official release yet.
 If you prefer a more stable version, you can optionally checkout a specific release tag from the repository before installing dependencies and starting the application. This allows you to run the exact code corresponding to an official release while still using the source-based installation method.
 
-Running HostPro Cloud from source can be useful for debugging, contributing to the project, or integrating custom functionality, since you have direct access to the entire codebase and can easily update it using standard Git workflows.
+Running Host Pro Cloud from source can be useful for debugging, contributing to the project, or integrating custom functionality, since you have direct access to the entire codebase and can easily update it using standard Git workflows.
 
 ### Manual Installation
 ```bash
-git clone https://github.com/HostPro Cloud/project-pegaprox.git
+git clone https://github.com/Host Pro Cloud/project-pegaprox.git
 cd project-pegaprox
 pip install -r requirements.txt
 python3 pegaprox_multi_cluster.py
@@ -276,7 +276,7 @@ docker run -d --name pegaprox \
 
 For local builds:
 ```bash
-git clone https://github.com/HostPro Cloud/project-pegaprox.git
+git clone https://github.com/Host Pro Cloud/project-pegaprox.git
 cd project-pegaprox
 docker build -t pegaprox .
 docker run -d --name pegaprox \
@@ -289,7 +289,7 @@ docker run -d --name pegaprox \
 
 ### Debian Package (.deb build)
 ```bash
-git clone https://github.com/HostPro Cloud/project-pegaprox.git
+git clone https://github.com/Host Pro Cloud/project-pegaprox.git
 cd project-pegaprox
 
 dpkg-buildpackage -us -uc
@@ -300,8 +300,8 @@ sudo dpkg -i ../pegaprox_*.deb
 
 **Option 1: Update Script (Recommended)**
 ```bash
-cd /opt/HostPro Cloud
-curl -O https://raw.githubusercontent.com/HostPro Cloud/project-pegaprox/refs/heads/main/update.sh
+cd /opt/Host Pro Cloud
+curl -O https://raw.githubusercontent.com/Host Pro Cloud/project-pegaprox/refs/heads/main/update.sh
 chmod +x update.sh
 sudo ./update.sh
 ```
@@ -312,7 +312,7 @@ Go to Settings → Updates and click "Check for Updates".
 
 ## 🔧 Configuration
 
-After starting HostPro Cloud, open your browser and navigate to:
+After starting Host Pro Cloud, open your browser and navigate to:
 
 ```
 https://your-server-ip:5000
@@ -327,7 +327,7 @@ A fresh install has no default credentials:
 ## 📁 Directory Structure
 
 ```
-/opt/HostPro Cloud/
+/opt/Host Pro Cloud/
 ├── pegaprox_multi_cluster.py   # Entry point
 ├── pegaprox/                   # Application package
 │   ├── app.py                  # Flask app factory
@@ -369,13 +369,13 @@ Full documentation is available at **[docs.pegaprox.com](https://docs.pegaprox.c
 
 This project is licensed under the AGPL-3.0 License - see the [LICENSE](LICENSE) file for details.
 
-**Attribution (AGPL §7b):** Under Section 7(b) of the AGPL, the **"Powered by HostPro Cloud"** attribution shown in the client portal is a *required* author attribution and must be preserved in every copy and modified/derivative version — see the [NOTICE](NOTICE) file. Note also that AGPL §13 requires anyone hosting a **modified** version for network users to publish that version's complete source to those users. HostPro Cloud is AGPL-3.0 only — the attribution applies to everyone, without exception.
+**Attribution (AGPL §7b):** Under Section 7(b) of the AGPL, the **"Powered by Host Pro Cloud"** attribution shown in the client portal is a *required* author attribution and must be preserved in every copy and modified/derivative version — see the [NOTICE](NOTICE) file. Note also that AGPL §13 requires anyone hosting a **modified** version for network users to publish that version's complete source to those users. Host Pro Cloud is AGPL-3.0 only — the attribution applies to everyone, without exception.
 
 ## 💬 Support
 
 - 💬 Discord: [Community Server](https://discord.gg/AJPf3H62QW)
 - 📧 Email: support@pegaprox.com
-- 🐛 Issues: [GitHub Issues](https://github.com/HostPro Cloud/project-pegaprox/issues)
+- 🐛 Issues: [GitHub Issues](https://github.com/Host Pro Cloud/project-pegaprox/issues)
 
 ## 🤖 Development Tools
 
@@ -385,7 +385,7 @@ AI-driven security auditing is an industry-standard practice - see [Hacker News]
 
 ## ⭐ Star History
 
-If you find HostPro Cloud useful, please consider giving it a star! ⭐
+If you find Host Pro Cloud useful, please consider giving it a star! ⭐
 
 ---
 
