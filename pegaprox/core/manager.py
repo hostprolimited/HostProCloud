@@ -14293,18 +14293,22 @@ echo "AGENT_INSTALLED_OK"
                 data['ssh-public-keys'] = ssh_keys
             
             # Features (nesting, keyctl, fuse, mount) — #278
-            features = []
-            if ct_config.get('nesting'):
-                features.append('nesting=1')
-            if ct_config.get('keyctl'):
-                features.append('keyctl=1')
-            if ct_config.get('fuse'):
-                features.append('fuse=1')
-            mount = ct_config.get('mount', '')
-            if mount:
-                features.append(f"mount={mount}")
-            if features:
-                data['features'] = ','.join(features)
+            if ct_config.get('features'):
+                data['features'] = ct_config['features']
+            else:
+                features = []
+                # Default nesting=1 and keyctl=1 for modern systemd compatibility (Ubuntu 22/24, Debian 12/13, systemd 255+)
+                if ct_config.get('nesting', True):
+                    features.append('nesting=1')
+                if ct_config.get('keyctl', True):
+                    features.append('keyctl=1')
+                if ct_config.get('fuse'):
+                    features.append('fuse=1')
+                mount = ct_config.get('mount', '')
+                if mount:
+                    features.append(f"mount={mount}")
+                if features:
+                    data['features'] = ','.join(features)
             
             # MK: HA config (will be applied after CT creation)
             ha_enabled = ct_config.get('ha_enabled', False)
