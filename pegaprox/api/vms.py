@@ -7361,6 +7361,7 @@ def create_snapshot_api(cluster_id, node, vm_type, vmid):
 
 
 @bp.route('/api/clusters/<cluster_id>/vms/<node>/<vm_type>/<int:vmid>/snapshots/<snapname>', methods=['DELETE'])
+@bp.route('/api/clusters/<cluster_id>/vms/<node>/<vm_type>/<int:vmid>/snapshot/<snapname>', methods=['DELETE'])
 @require_auth(perms=['vm.snapshot'])
 def delete_snapshot_api(cluster_id, node, vm_type, vmid, snapname):
     ok, err = check_cluster_access(cluster_id)
@@ -7369,6 +7370,16 @@ def delete_snapshot_api(cluster_id, node, vm_type, vmid, snapname):
     if cluster_id not in cluster_managers:
         return jsonify({'error': 'Cluster not found'}), 404
     
+    mgr = cluster_managers[cluster_id]
+    try:
+        actual_type, actual_node = mgr.find_guest_type_and_node(vmid)
+        if actual_type:
+            vm_type = actual_type
+        if actual_node:
+            node = actual_node
+    except Exception:
+        pass
+
     # MK: Check pool permission for vm.snapshot
     user = build_authz_user(request.session.get('user', ''), request.session)
     if not user_can_access_vm(user, cluster_id, vmid, 'vm.snapshot', vm_type):
@@ -7376,7 +7387,6 @@ def delete_snapshot_api(cluster_id, node, vm_type, vmid, snapname):
     denied = _xapi_refusal(cluster_id, user, 'vm.snapshot')
     if denied: return denied
 
-    mgr = cluster_managers[cluster_id]
     result = mgr.delete_snapshot(node, vmid, vm_type, snapname)
     
     if result['success']:
@@ -7388,6 +7398,7 @@ def delete_snapshot_api(cluster_id, node, vm_type, vmid, snapname):
 
 
 @bp.route('/api/clusters/<cluster_id>/vms/<node>/<vm_type>/<int:vmid>/snapshots/<snapname>/rollback', methods=['POST'])
+@bp.route('/api/clusters/<cluster_id>/vms/<node>/<vm_type>/<int:vmid>/snapshot/<snapname>/rollback', methods=['POST'])
 @require_auth(perms=['vm.snapshot'])
 def rollback_snapshot_api(cluster_id, node, vm_type, vmid, snapname):
     ok, err = check_cluster_access(cluster_id)
@@ -7396,6 +7407,16 @@ def rollback_snapshot_api(cluster_id, node, vm_type, vmid, snapname):
     if cluster_id not in cluster_managers:
         return jsonify({'error': 'Cluster not found'}), 404
     
+    mgr = cluster_managers[cluster_id]
+    try:
+        actual_type, actual_node = mgr.find_guest_type_and_node(vmid)
+        if actual_type:
+            vm_type = actual_type
+        if actual_node:
+            node = actual_node
+    except Exception:
+        pass
+
     # MK: Check pool permission for vm.snapshot
     user = build_authz_user(request.session.get('user', ''), request.session)
     if not user_can_access_vm(user, cluster_id, vmid, 'vm.snapshot', vm_type):
