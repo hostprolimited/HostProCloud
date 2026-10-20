@@ -426,7 +426,7 @@ def _run_deploy(dep_id, cluster_id, node, template_id, storage, vmid, vm_name):
         create_cmd = (
             f"qm create {vmid_i} --name {q_vm_name} "
             f"--memory {memory} --cores {cores} "
-            f"--net0 virtio,bridge=vmbr0 --ostype l26 --agent 1 --serial0 socket --vga serial0"
+            f"--net0 virtio,bridge=vmbr0 --ostype l26 --agent 1 --vga default"
         )
         if tpl.get('cpu'):
             create_cmd += f" --cpu {shlex.quote(str(tpl['cpu']))}"
