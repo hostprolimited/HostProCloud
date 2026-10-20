@@ -567,3 +567,31 @@ def install_log_record_sanitizer():
 
     logging.setLogRecordFactory(_sanitising_factory)
     _RECORD_FACTORY_INSTALLED = True
+
+
+def sanitize_sshkeys_for_pve(value: str) -> str:
+    """Ensure SSH public key(s) are strictly RFC 3986 percent-encoded for Proxmox VE.
+    
+    Proxmox VE verifies Cloud-Init `sshkeys` against Perl schema /^[a-zA-Z0-9\.\-\_\~\%]+$/.
+    Clients passing raw SSH keys (with spaces or newlines) or using PHP urlencode()
+    (which encodes spaces as '+' instead of '%20') fail Proxmox parameter verification.
+    This function normalizes any input (raw keys, plus-encoded, or percent-encoded) into
+    a strictly valid RFC 3986 percent-encoded string.
+    """
+    if not value or not isinstance(value, str):
+        return value
+    s = value.strip()
+    if not s:
+        return s
+    
+    pattern = r'^[a-zA-Z0-9\.\-\_\~\%]+$'
+    if re.fullmatch(pattern, s):
+        return s
+    
+    import urllib.parse
+    if '+' in s and '%' in s:
+        s = urllib.parse.unquote_plus(s)
+    elif '%' in s:
+        s = urllib.parse.unquote(s)
+    
+    return urllib.parse.quote(s, safe='.-_~')

@@ -6,7 +6,7 @@ import sys
 import json
 import time
 import logging
-from pegaprox.utils.sanitization import sanitize_log_message as _sl  # CWE-117 tainted-log sanitiser
+from pegaprox.utils.sanitization import sanitize_log_message as _sl, sanitize_sshkeys_for_pve  # CWE-117 tainted-log sanitiser
 from pegaprox.utils.ssh_security import apply_host_key_policy, persist_host_keys, secure_ssh_client  # TOFU SSH host-key verification
 import threading
 import uuid
@@ -4441,6 +4441,8 @@ def clone_vm_api(cluster_id, node, vm_type, vmid):
                 if data.get(ci_key):
                     ci_params[ci_key] = data[ci_key]
             if ci_params:
+                if 'sshkeys' in ci_params:
+                    ci_params['sshkeys'] = sanitize_sshkeys_for_pve(ci_params['sshkeys'])
                 try:
                     upid = result.get('data')
                     if upid:
