@@ -50,7 +50,7 @@ HOSTPRO_MOTD_TEXT = (
     "================================================================================\n"
     " * Client Portal:        https://portal.hostpro.co.ke/clientarea.php\n"
     " * Technical Support:    support@hostpro.co.ke\n"
-    " * Knowledgebase:        https://www.hostpro.co.ke/\n"
+    " * Website:        https://www.hostpro.co.ke/\n"
     "--------------------------------------------------------------------------------\n"
     " Thank you for hosting with Host Pro Limited!\n"
     "================================================================================\n"
@@ -118,7 +118,7 @@ write_files:
       ================================================================================
        * Client Portal:        https://portal.hostpro.co.ke/clientarea.php
        * Technical Support:    support@hostpro.co.ke
-       * Knowledgebase:        https://www.hostpro.co.ke/
+       * Website:        https://www.hostpro.co.ke/
       --------------------------------------------------------------------------------
        Thank you for hosting with Host Pro Limited!
       ================================================================================
