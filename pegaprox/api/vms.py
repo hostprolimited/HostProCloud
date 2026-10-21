@@ -4445,6 +4445,8 @@ def clone_vm_api(cluster_id, node, vm_type, vmid):
             # Ensure Host Pro vendor snippet is applied if not explicitly customized
             if 'cicustom' not in ci_params:
                 ci_params['cicustom'] = 'vendor=local:snippets/hostpro-vendor.yaml'
+            # Ensure QEMU Guest Agent is enabled
+            ci_params['agent'] = data.get('agent') or '1,fstrim_cloned_disks=1'
             # Display: Default display and NOT serial0 (delete serial0 and vga so PVE defaults to standard VGA)
             del_targets = {'serial0', 'vga'}
             if 'delete' in ci_params:

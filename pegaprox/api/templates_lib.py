@@ -62,6 +62,9 @@ disable_root: false
 chpasswd:
   expire: false
 
+packages:
+  - qemu-guest-agent
+
 bootcmd:
   - mkdir -p /etc/ssh/sshd_config.d
   - printf 'PasswordAuthentication yes\\nPermitRootLogin yes\\nKbdInteractiveAuthentication yes\\n' > /etc/ssh/sshd_config.d/50-cloud-init.conf
@@ -69,6 +72,8 @@ bootcmd:
   - sed -i 's/^#\\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config 2>/dev/null || true
   - sed -i 's/^#\\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config 2>/dev/null || true
   - sed -i 's/^#\\?KbdInteractiveAuthentication.*/KbdInteractiveAuthentication yes/' /etc/ssh/sshd_config 2>/dev/null || true
+  - systemctl enable qemu-guest-agent 2>/dev/null || true
+  - systemctl start qemu-guest-agent 2>/dev/null || true
 
 write_files:
   - path: /etc/ssh/sshd_config.d/50-cloud-init.conf
@@ -103,6 +108,64 @@ write_files:
       [Install]
       WantedBy=multi-user.target
 
+  - path: /etc/systemd/system/hostpro-guest-agent.service
+    permissions: '0644'
+    content: |
+      [Unit]
+      Description=Host Pro Enforce QEMU Guest Agent Running
+      After=network.target local-fs.target
+      Wants=qemu-guest-agent.service
+
+      [Service]
+      Type=oneshot
+      ExecStart=/bin/sh -c "which qemu-ga >/dev/null 2>&1 || (apt-get update && apt-get install -y qemu-guest-agent) || dnf install -y qemu-guest-agent || yum install -y qemu-guest-agent || zypper install -y qemu-guest-agent || apk add qemu-guest-agent 2>/dev/null || true; systemctl daemon-reload 2>/dev/null || true; systemctl enable --now qemu-guest-agent 2>/dev/null || service qemu-guest-agent start 2>/dev/null || true"
+      RemainAfterExit=true
+
+      [Install]
+      WantedBy=multi-user.target
+
+  - path: /etc/sysctl.d/99-hostpro-performance.conf
+    permissions: '0644'
+    content: |
+      # Host Pro High-Density Hosting & cPanel Performance Tuning
+      # Virtual Memory: prevent sudden swapping bursts and 100% CPU lockups
+      vm.swappiness = 10
+      vm.dirty_ratio = 10
+      vm.dirty_background_ratio = 5
+      vm.vfs_cache_pressure = 50
+
+      # File Handles: allow thousands of concurrent file descriptors
+      fs.file-max = 2097152
+      fs.inotify.max_user_watches = 524288
+      fs.inotify.max_user_instances = 8192
+
+      # Network Socket Tuning: handle massive concurrent traffic without packet loss
+      net.core.somaxconn = 65535
+      net.ipv4.tcp_max_syn_backlog = 65535
+      net.core.netdev_max_backlog = 16384
+      net.ipv4.tcp_tw_reuse = 1
+      net.ipv4.tcp_fin_timeout = 15
+      net.ipv4.ip_local_port_range = 1024 65535
+      net.ipv4.tcp_slow_start_after_idle = 0
+
+  - path: /etc/security/limits.d/99-hostpro-limits.conf
+    permissions: '0644'
+    content: |
+      * soft nofile 65536
+      * hard nofile 1048576
+      * soft nproc 32768
+      * hard nproc 65536
+      root soft nofile 1048576
+      root hard nofile 1048576
+
+  - path: /etc/systemd/system.conf.d/99-hostpro-limits.conf
+    permissions: '0644'
+    content: |
+      [Manager]
+      DefaultLimitNOFILE=1048576
+      DefaultLimitNPROC=524288
+      DefaultTasksMax=100000
+
   - path: /etc/motd
     permissions: '0644'
     content: |
@@ -132,13 +195,18 @@ runcmd:
   - systemctl daemon-reload 2>/dev/null || true
   - systemctl enable hostpro-ssh-auth.service 2>/dev/null || true
   - systemctl start hostpro-ssh-auth.service 2>/dev/null || true
+  - systemctl enable hostpro-guest-agent.service 2>/dev/null || true
+  - systemctl start hostpro-guest-agent.service 2>/dev/null || true
+  - which qemu-ga >/dev/null 2>&1 || (apt-get update && apt-get install -y qemu-guest-agent) || dnf install -y qemu-guest-agent || yum install -y qemu-guest-agent || zypper install -y qemu-guest-agent || apk add qemu-guest-agent 2>/dev/null || true
+  - systemctl enable --now qemu-guest-agent 2>/dev/null || true
+  - systemctl restart qemu-guest-agent 2>/dev/null || systemctl start qemu-guest-agent 2>/dev/null || service qemu-guest-agent restart 2>/dev/null || true
   - mkdir -p /etc/ssh/sshd_config.d
   - printf 'PasswordAuthentication yes\\nPermitRootLogin yes\\nKbdInteractiveAuthentication yes\\n' > /etc/ssh/sshd_config.d/50-cloud-init.conf
   - printf 'PasswordAuthentication yes\\nPermitRootLogin yes\\nKbdInteractiveAuthentication yes\\n' > /etc/ssh/sshd_config.d/00-hostpro-auth.conf
   - sed -i 's/^#\\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config 2>/dev/null || true
   - sed -i 's/^#\\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config 2>/dev/null || true
   - sed -i 's/^#\\?KbdInteractiveAuthentication.*/KbdInteractiveAuthentication yes/' /etc/ssh/sshd_config 2>/dev/null || true
-  - sh -c 'for f in /etc/ssh/sshd_config.d/*.conf; do [ -f "$f" ] && sed -i "s/^#\\?PasswordAuthentication.*/PasswordAuthentication yes/" "$f" && sed -i "s/^#\\?PermitRootLogin.*/PermitRootLogin yes/" "$f" && sed -i "s/^#\\?KbdInteractiveAuthentication.*/KbdInteractiveAuthentication yes/" "$f"; done' 2>/dev/null || true
+  - sysctl --system 2>/dev/null || sysctl -p /etc/sysctl.d/99-hostpro-performance.conf 2>/dev/null || true
   - systemctl restart ssh || systemctl restart sshd || service ssh restart || service sshd restart 2>/dev/null || true
 
 """
@@ -591,6 +659,7 @@ def _run_deploy(dep_id, cluster_id, node, template_id, storage, vmid, vm_name):
             f"--scsi0 {scsi_arg} "
             f"--ide2 {ide_arg} "
             f"--boot c --bootdisk scsi0 "
+            f"--agent 1,fstrim_cloned_disks=1 "
             f"--delete serial0,vga "
             f"--cicustom \"vendor=local:snippets/hostpro-vendor.yaml\"",
             'qm set'
@@ -957,7 +1026,7 @@ def ensure_vendor_snippet_api(cluster_id, node):
                 f"chmod 0644 {snippet_path}; "
                 f"for tmpl_id in $(qm list 2>/dev/null | awk '$1 ~ /^[0-9]+$/ {{print $1}}'); do "
                 f"  if qm config $tmpl_id 2>/dev/null | grep -q 'template: 1'; then "
-                f"    qm set $tmpl_id --cicustom 'vendor=local:snippets/hostpro-vendor.yaml' --delete serial0,vga 2>/dev/null || true; "
+                f"    qm set $tmpl_id --agent 1,fstrim_cloned_disks=1 --cicustom 'vendor=local:snippets/hostpro-vendor.yaml' --delete serial0,vga 2>/dev/null || true; "
                 f"  fi; "
                 f"done"
             )
