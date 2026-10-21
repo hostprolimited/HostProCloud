@@ -342,7 +342,9 @@ def get_cluster_vms_list(cluster_id):
                 'name': r.get('name', ''),
                 'node': r.get('node'),
                 'type': r.get('type'),
-                'status': r.get('status', 'unknown')
+                'status': r.get('status', 'unknown'),
+                'template': int(r.get('template', 0) or 0),
+                'tags': r.get('tags', '')
             })
     vms.sort(key=lambda x: x.get('vmid', 0))
     return jsonify({'vms': vms})
