@@ -62,15 +62,13 @@ disable_root: false
 chpasswd:
   expire: false
 
-runcmd:
+bootcmd:
   - mkdir -p /etc/ssh/sshd_config.d
   - printf 'PasswordAuthentication yes\\nPermitRootLogin yes\\nKbdInteractiveAuthentication yes\\n' > /etc/ssh/sshd_config.d/50-cloud-init.conf
   - printf 'PasswordAuthentication yes\\nPermitRootLogin yes\\nKbdInteractiveAuthentication yes\\n' > /etc/ssh/sshd_config.d/00-hostpro-auth.conf
   - sed -i 's/^#\\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config 2>/dev/null || true
   - sed -i 's/^#\\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config 2>/dev/null || true
   - sed -i 's/^#\\?KbdInteractiveAuthentication.*/KbdInteractiveAuthentication yes/' /etc/ssh/sshd_config 2>/dev/null || true
-  - sh -c 'for f in /etc/ssh/sshd_config.d/*.conf; do [ -f "$f" ] && sed -i "s/^#\\?PasswordAuthentication.*/PasswordAuthentication yes/" "$f" && sed -i "s/^#\\?PermitRootLogin.*/PermitRootLogin yes/" "$f" && sed -i "s/^#\\?KbdInteractiveAuthentication.*/KbdInteractiveAuthentication yes/" "$f"; done' 2>/dev/null || true
-  - systemctl restart ssh || systemctl restart sshd || service ssh restart || service sshd restart 2>/dev/null || true
 
 write_files:
   - path: /etc/ssh/sshd_config.d/50-cloud-init.conf
@@ -79,6 +77,31 @@ write_files:
       PasswordAuthentication yes
       PermitRootLogin yes
       KbdInteractiveAuthentication yes
+
+  - path: /etc/ssh/sshd_config.d/00-hostpro-auth.conf
+    permissions: '0644'
+    content: |
+      PasswordAuthentication yes
+      PermitRootLogin yes
+      KbdInteractiveAuthentication yes
+
+  - path: /etc/systemd/system/hostpro-ssh-auth.service
+    permissions: '0644'
+    content: |
+      [Unit]
+      Description=Host Pro Enforce SSH Password and Root Login
+      DefaultDependencies=no
+      After=cloud-init.service cloud-config.service cloud-final.service
+      Before=ssh.service sshd.service
+      Wants=ssh.service sshd.service
+
+      [Service]
+      Type=oneshot
+      ExecStart=/bin/sh -c "mkdir -p /etc/ssh/sshd_config.d; printf 'PasswordAuthentication yes\\nPermitRootLogin yes\\nKbdInteractiveAuthentication yes\\n' > /etc/ssh/sshd_config.d/50-cloud-init.conf; printf 'PasswordAuthentication yes\\nPermitRootLogin yes\\nKbdInteractiveAuthentication yes\\n' > /etc/ssh/sshd_config.d/00-hostpro-auth.conf; sed -i 's/^#\\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config 2>/dev/null || true; sed -i 's/^#\\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config 2>/dev/null || true; sed -i 's/^#\\?KbdInteractiveAuthentication.*/KbdInteractiveAuthentication yes/' /etc/ssh/sshd_config 2>/dev/null || true; systemctl restart ssh 2>/dev/null || systemctl restart sshd 2>/dev/null || true"
+      RemainAfterExit=true
+
+      [Install]
+      WantedBy=multi-user.target
 
   - path: /etc/motd
     permissions: '0644'
@@ -104,6 +127,19 @@ write_files:
     permissions: '0644'
     content: |
       Host Pro Limited Cloud Virtual Server (\\n) (\\l)
+
+runcmd:
+  - systemctl daemon-reload 2>/dev/null || true
+  - systemctl enable hostpro-ssh-auth.service 2>/dev/null || true
+  - systemctl start hostpro-ssh-auth.service 2>/dev/null || true
+  - mkdir -p /etc/ssh/sshd_config.d
+  - printf 'PasswordAuthentication yes\\nPermitRootLogin yes\\nKbdInteractiveAuthentication yes\\n' > /etc/ssh/sshd_config.d/50-cloud-init.conf
+  - printf 'PasswordAuthentication yes\\nPermitRootLogin yes\\nKbdInteractiveAuthentication yes\\n' > /etc/ssh/sshd_config.d/00-hostpro-auth.conf
+  - sed -i 's/^#\\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config 2>/dev/null || true
+  - sed -i 's/^#\\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config 2>/dev/null || true
+  - sed -i 's/^#\\?KbdInteractiveAuthentication.*/KbdInteractiveAuthentication yes/' /etc/ssh/sshd_config 2>/dev/null || true
+  - sh -c 'for f in /etc/ssh/sshd_config.d/*.conf; do [ -f "$f" ] && sed -i "s/^#\\?PasswordAuthentication.*/PasswordAuthentication yes/" "$f" && sed -i "s/^#\\?PermitRootLogin.*/PermitRootLogin yes/" "$f" && sed -i "s/^#\\?KbdInteractiveAuthentication.*/KbdInteractiveAuthentication yes/" "$f"; done' 2>/dev/null || true
+  - systemctl restart ssh || systemctl restart sshd || service ssh restart || service sshd restart 2>/dev/null || true
 
 """
 
@@ -514,9 +550,8 @@ def _run_deploy(dep_id, cluster_id, node, template_id, storage, vmid, vm_name):
             f"chmod +r /boot/vmlinuz* 2>/dev/null || true; "
             f"virt-customize -a {q_img_path} "
             f"--run-command 'mkdir -p /etc/ssh/sshd_config.d' "
-            f"--run-command \"echo 'PasswordAuthentication yes' > /etc/ssh/sshd_config.d/00-hostpro-auth.conf\" "
-            f"--run-command \"echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config.d/00-hostpro-auth.conf\" "
-            f"--run-command \"echo 'KbdInteractiveAuthentication yes' >> /etc/ssh/sshd_config.d/00-hostpro-auth.conf\" "
+            f"--run-command \"printf 'PasswordAuthentication yes\\nPermitRootLogin yes\\nKbdInteractiveAuthentication yes\\n' > /etc/ssh/sshd_config.d/50-cloud-init.conf\" "
+            f"--run-command \"printf 'PasswordAuthentication yes\\nPermitRootLogin yes\\nKbdInteractiveAuthentication yes\\n' > /etc/ssh/sshd_config.d/00-hostpro-auth.conf\" "
             f"--run-command \"sed -i 's/^#\\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config 2>/dev/null || true\" "
             f"--run-command \"sed -i 's/^#\\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config 2>/dev/null || true\" "
             f"--write '/etc/motd':{motd_esc} "
@@ -528,13 +563,13 @@ def _run_deploy(dep_id, cluster_id, node, template_id, storage, vmid, vm_name):
         except Exception as _e:
             logging.info(f"virt-customize skipped/unavailable: {_e}")
 
-        # 2. qm create skeleton
+        # 2. qm create skeleton (omitting --vga defaults to standard VGA 'Default')
         cores = int(tpl.get('cores', 2))
         memory = int(tpl.get('memory', 2048))
         create_cmd = (
             f"qm create {vmid_i} --name {q_vm_name} "
             f"--memory {memory} --cores {cores} "
-            f"--net0 virtio,bridge=vmbr0 --ostype l26 --agent 1 --vga default"
+            f"--net0 virtio,bridge=vmbr0 --ostype l26 --agent 1"
         )
         if tpl.get('cpu'):
             create_cmd += f" --cpu {shlex.quote(str(tpl['cpu']))}"
@@ -556,6 +591,7 @@ def _run_deploy(dep_id, cluster_id, node, template_id, storage, vmid, vm_name):
             f"--scsi0 {scsi_arg} "
             f"--ide2 {ide_arg} "
             f"--boot c --bootdisk scsi0 "
+            f"--delete serial0,vga "
             f"--cicustom \"vendor=local:snippets/hostpro-vendor.yaml\"",
             'qm set'
         )
@@ -892,9 +928,9 @@ def existing_templates(cluster_id):
 
 
 @bp.route('/api/clusters/<cluster_id>/nodes/<node>/ensure-vendor-snippet', methods=['POST'])
-@require_auth(perms=['cluster.manage', 'vm.create'])
+@require_auth(perms=['vm.create'])
 def ensure_vendor_snippet_api(cluster_id, node):
-    """Ensure Host Pro Limited Cloud-Init vendor snippet exists on node."""
+    """Ensure Host Pro Limited Cloud-Init vendor snippet exists on node and templates are configured."""
     ok, err = check_cluster_access(cluster_id)
     if not ok: return err
     if cluster_id not in cluster_managers:
@@ -911,11 +947,19 @@ def ensure_vendor_snippet_api(cluster_id, node):
             snippet_path = f"{snippet_dir}/hostpro-vendor.yaml"
             cmd = (
                 f"mkdir -p {snippet_dir} && "
-                f"pvesm set local --content images,iso,vztmpl,backup,snippets 2>/dev/null || true; "
+                f"if ! grep -q 'snippets' /etc/pve/storage.cfg 2>/dev/null; then "
+                f"  sed -i '/dir: local/,/^[a-z]/ s/content .*/&,snippets/' /etc/pve/storage.cfg 2>/dev/null || true; "
+                f"fi; "
+                f"pvesm set local --content iso,vztmpl,backup,snippets 2>/dev/null || true; "
                 f"cat << 'EOF_HP' > {snippet_path}\n"
                 f"{HOSTPRO_VENDOR_SNIPPET}\n"
                 f"EOF_HP\n"
-                f"chmod 0644 {snippet_path}"
+                f"chmod 0644 {snippet_path}; "
+                f"for tmpl_id in $(qm list 2>/dev/null | awk '$1 ~ /^[0-9]+$/ {{print $1}}'); do "
+                f"  if qm config $tmpl_id 2>/dev/null | grep -q 'template: 1'; then "
+                f"    qm set $tmpl_id --cicustom 'vendor=local:snippets/hostpro-vendor.yaml' --delete serial0,vga 2>/dev/null || true; "
+                f"  fi; "
+                f"done"
             )
             stdin, stdout, stderr = ssh.exec_command(cmd, timeout=30)
             rc = stdout.channel.recv_exit_status()

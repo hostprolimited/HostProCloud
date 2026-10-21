@@ -4443,8 +4443,13 @@ def clone_vm_api(cluster_id, node, vm_type, vmid):
             # Ensure Host Pro vendor snippet is applied if not explicitly customized
             if 'cicustom' not in ci_params:
                 ci_params['cicustom'] = 'vendor=local:snippets/hostpro-vendor.yaml'
-            ci_params['vga'] = 'default'
-            ci_params['delete'] = 'serial0'
+            # Display: Default display and NOT serial0 (delete serial0 and vga so PVE defaults to standard VGA)
+            del_targets = {'serial0', 'vga'}
+            if 'delete' in ci_params:
+                existing_del = [d.strip() for d in str(ci_params['delete']).split(',') if d.strip()]
+                del_targets.update(existing_del)
+            ci_params['delete'] = ','.join(sorted(del_targets))
+            ci_params.pop('vga', None)
             if ci_params:
                 if 'sshkeys' in ci_params:
                     ci_params['sshkeys'] = sanitize_sshkeys_for_pve(ci_params['sshkeys'])
@@ -4454,7 +4459,12 @@ def clone_vm_api(cluster_id, node, vm_type, vmid):
                         manager._wait_for_task(node, upid, timeout=600)
                     clone_node = data.get('target_node') or node
                     ci_url = f"https://{manager.host}:{manager.api_port}/api2/json/nodes/{clone_node}/qemu/{newid}/config"
-                    manager._api_post(ci_url, data=ci_params)
+                    resp = manager._api_post(ci_url, data=ci_params)
+                    if resp.status_code != 200:
+                        logging.warning(f"[CLONE] First attempt failed: {resp.text}")
+                        if 'cicustom' in ci_params and ('cicustom' in resp.text.lower() or 'snippet' in resp.text.lower()):
+                            fallback_params = {k: v for k, v in ci_params.items() if k != 'cicustom'}
+                            manager._api_post(ci_url, data=fallback_params)
                     logging.info(f"[CLONE] Applied Cloud-Init config to VM {newid}: {list(ci_params.keys())}")
                 except Exception as e:
                     logging.warning(f"[CLONE] Cloud-Init config failed for {newid}: {e}")
@@ -5673,6 +5683,14 @@ def update_vm_config_api(cluster_id, node, vm_type, vmid):
             return jsonify({'error': 'Config values are strings or numbers'}), 400
         # a cluster connected with root@pam's own password takes QEMU args, a hookscript or
         # a host device from us where PVE refuses every token (#1102)
+        # Proxmox VGA display 'default' is not a valid enum value; it means deleting vga so Proxmox defaults to standard VGA
+        if config_updates.get('vga') == 'default':
+            del config_updates['vga']
+            del_targets = {'vga'}
+            if 'delete' in config_updates:
+                del_targets.update([d.strip() for d in str(config_updates['delete']).split(',') if d.strip()])
+            config_updates['delete'] = ','.join(sorted(del_targets))
+
         if caller_is_scoped(user, cluster_id):
             root_key = _root_only_config_key(manager, node, vmid, vm_type, config_updates)
             if root_key:

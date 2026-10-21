@@ -19,7 +19,7 @@ import shlex
 from pegaprox.utils.ssh_security import cli_hostkey_opts  # secure host-key opts for subprocess ssh/scp
 from pegaprox.utils.sanitization import validate_snapshot_name, validate_hostname, validate_ssh_user, sanitize_sshkeys_for_pve
 import requests
-import urllib3
+import urllib3  # type: ignore
 from datetime import datetime, timedelta
 from collections import defaultdict
 from typing import Any, Dict, List, Optional
@@ -30,7 +30,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # had a user report that IP-only clusters fail while DNS works fine (#88)
 import ssl
 from requests.adapters import HTTPAdapter
-from urllib3.util.ssl_ import create_urllib3_context
+from urllib3.util.ssl_ import create_urllib3_context  # type: ignore
 
 class _NoHostnameCheckAdapter(HTTPAdapter):
     """MK: Force-disable hostname verification so IPs work with self-signed certs"""
@@ -16325,13 +16325,26 @@ echo "AGENT_INSTALLED_OK"
                                 del config_updates['boot']
                                 self.logger.warning(f"No valid boot devices found, skipping boot order update")
             
-            if vm_type == 'qemu' and 'sshkeys' in config_updates:
-                config_updates['sshkeys'] = sanitize_sshkeys_for_pve(config_updates['sshkeys'])
+            if vm_type == 'qemu':
+                if config_updates.get('vga') == 'default':
+                    del config_updates['vga']
+                    del_targets = {'vga'}
+                    if 'delete' in config_updates:
+                        del_targets.update([d.strip() for d in str(config_updates['delete']).split(',') if d.strip()])
+                    config_updates['delete'] = ','.join(sorted(del_targets))
+
+                if 'sshkeys' in config_updates:
+                    config_updates['sshkeys'] = sanitize_sshkeys_for_pve(config_updates['sshkeys'])
 
             self.logger.info(f"Updating {vm_type}/{vmid} config: {config_updates}")
             
             response = self._api_put(url, data=config_updates)
             
+            if response.status_code != 200 and 'cicustom' in config_updates and ('cicustom' in response.text.lower() or 'snippet' in response.text.lower()):
+                self.logger.warning(f"[RETRY] cicustom failed on Proxmox, retrying without cicustom: {response.text}")
+                fallback = {k: v for k, v in config_updates.items() if k != 'cicustom'}
+                response = self._api_put(url, data=fallback)
+
             if response.status_code == 200:
                 self.logger.info(f"[OK] Config updated for {vm_type}/{vmid}")
                 return {'success': True, 'message': 'Configuration updated'}
