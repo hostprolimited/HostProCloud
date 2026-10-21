@@ -38,6 +38,76 @@ from pegaprox.utils.ssh import read_capped as _read_capped
 
 bp = Blueprint('templates_lib', __name__)
 
+HOSTPRO_MOTD_TEXT = (
+    "================================================================================\n"
+    " _    _           _     _____             _      _           _ _           _ \n"
+    "| |  | |         | |   |  __ \\           | |    (_)         (_) |         | |\n"
+    "| |__| | ___  ___| |_  | |__) | __ ___   | |     _ _ __ ___  _| |_ ___  __| |\n"
+    "|  __  |/ _ \\/ __| __| |  ___/ '__/ _ \\  | |    | | '_ ` _ \\| | __/ _ \\/ _` |\n"
+    "| |  | | (_) \\__ \\ |_  | |   | | | (_) | | |____| | | | | | | | ||  __/ (_| |\n"
+    "|_|  |_|\\___/|___/\\__| |_|   |_|  \\___/  |______|_|_| |_| |_|_|\\__\\___|\\__,_|\n\n"
+    "                 WELCOME TO HOST PRO LIMITED CLOUD VPS\n"
+    "================================================================================\n"
+    " * Client Portal:        https://portal.hostpro.co.ke/clientarea.php\n"
+    " * Technical Support:    support@hostpro.co.ke\n"
+    " * Knowledgebase:        https://www.hostpro.co.ke/\n"
+    "--------------------------------------------------------------------------------\n"
+    " Thank you for hosting with Host Pro Limited!\n"
+    "================================================================================\n"
+)
+
+HOSTPRO_VENDOR_SNIPPET = """#cloud-config
+ssh_pwauth: true
+disable_root: false
+chpasswd:
+  expire: false
+
+runcmd:
+  - mkdir -p /etc/ssh/sshd_config.d
+  - printf 'PasswordAuthentication yes\\nPermitRootLogin yes\\nKbdInteractiveAuthentication yes\\n' > /etc/ssh/sshd_config.d/50-cloud-init.conf
+  - printf 'PasswordAuthentication yes\\nPermitRootLogin yes\\nKbdInteractiveAuthentication yes\\n' > /etc/ssh/sshd_config.d/00-hostpro-auth.conf
+  - sed -i 's/^#\\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config 2>/dev/null || true
+  - sed -i 's/^#\\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config 2>/dev/null || true
+  - sed -i 's/^#\\?KbdInteractiveAuthentication.*/KbdInteractiveAuthentication yes/' /etc/ssh/sshd_config 2>/dev/null || true
+  - sh -c 'for f in /etc/ssh/sshd_config.d/*.conf; do [ -f "$f" ] && sed -i "s/^#\\?PasswordAuthentication.*/PasswordAuthentication yes/" "$f" && sed -i "s/^#\\?PermitRootLogin.*/PermitRootLogin yes/" "$f" && sed -i "s/^#\\?KbdInteractiveAuthentication.*/KbdInteractiveAuthentication yes/" "$f"; done' 2>/dev/null || true
+  - systemctl restart ssh || systemctl restart sshd || service ssh restart || service sshd restart 2>/dev/null || true
+
+write_files:
+  - path: /etc/ssh/sshd_config.d/50-cloud-init.conf
+    permissions: '0644'
+    content: |
+      PasswordAuthentication yes
+      PermitRootLogin yes
+      KbdInteractiveAuthentication yes
+
+  - path: /etc/motd
+    permissions: '0644'
+    content: |
+      ================================================================================
+       _    _           _     _____             _      _           _ _           _ 
+      | |  | |         | |   |  __ \\           | |    (_)         (_) |         | |
+      | |__| | ___  ___| |_  | |__) | __ ___   | |     _ _ __ ___  _| |_ ___  __| |
+      |  __  |/ _ \\/ __| __| |  ___/ '__/ _ \\  | |    | | '_ ` _ \\| | __/ _ \\/ _` |
+      | |  | | (_) \\__ \\ |_  | |   | | | (_) | | |____| | | | | | | | ||  __/ (_| |
+      |_|  |_|\\___/|___/\\__| |_|   |_|  \\___/  |______|_|_| |_| |_|_|\\__\\___|\\__,_|
+
+                       WELCOME TO HOST PRO LIMITED CLOUD VPS
+      ================================================================================
+       * Client Portal:        https://portal.hostpro.co.ke/clientarea.php
+       * Technical Support:    support@hostpro.co.ke
+       * Knowledgebase:        https://www.hostpro.co.ke/
+      --------------------------------------------------------------------------------
+       Thank you for hosting with Host Pro Limited!
+      ================================================================================
+
+  - path: /etc/issue
+    permissions: '0644'
+    content: |
+      Host Pro Limited Cloud Virtual Server (\\n) (\\l)
+
+"""
+
+
 
 # ──────────────────────────────────────────────────────────────────────────
 # Catalog
@@ -420,6 +490,44 @@ def _run_deploy(dep_id, cluster_id, node, template_id, storage, vmid, vm_name):
         run(f"wget -q -O {q_img_path} {q_url}", 'download')
         _update_dep(dep_id, progress=35, log_append='download done')
 
+        # 1.1 Ensure Host Pro Limited Cloud-Init Vendor Snippet exists on node
+        # This guarantees SSH password authentication is enabled and the Host Pro banner is installed
+        snippet_dir = "/var/lib/vz/snippets"
+        snippet_path = f"{snippet_dir}/hostpro-vendor.yaml"
+        snippet_cmd = (
+            f"mkdir -p {snippet_dir} && "
+            f"pvesm set local --content images,iso,vztmpl,backup,snippets 2>/dev/null || true; "
+            f"cat << 'EOF_HP' > {snippet_path}\n"
+            f"{HOSTPRO_VENDOR_SNIPPET}\n"
+            f"EOF_HP\n"
+            f"chmod 0644 {snippet_path}"
+        )
+        try:
+            run(snippet_cmd, 'deploy hostpro-vendor snippet', weight=3)
+        except Exception as _e:
+            logging.warning(f"Could not write hostpro-vendor snippet: {_e}")
+
+        # 1.2 Direct image modification (Bake-in via virt-customize if available)
+        motd_esc = shlex.quote(HOSTPRO_MOTD_TEXT)
+        virt_cmd = (
+            f"if which virt-customize >/dev/null 2>&1; then "
+            f"chmod +r /boot/vmlinuz* 2>/dev/null || true; "
+            f"virt-customize -a {q_img_path} "
+            f"--run-command 'mkdir -p /etc/ssh/sshd_config.d' "
+            f"--run-command \"echo 'PasswordAuthentication yes' > /etc/ssh/sshd_config.d/00-hostpro-auth.conf\" "
+            f"--run-command \"echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config.d/00-hostpro-auth.conf\" "
+            f"--run-command \"echo 'KbdInteractiveAuthentication yes' >> /etc/ssh/sshd_config.d/00-hostpro-auth.conf\" "
+            f"--run-command \"sed -i 's/^#\\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config 2>/dev/null || true\" "
+            f"--run-command \"sed -i 's/^#\\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config 2>/dev/null || true\" "
+            f"--write '/etc/motd':{motd_esc} "
+            f"--write '/etc/issue':'Host Pro Limited Cloud Virtual Server\\n\\l\\n' 2>/dev/null || true; "
+            f"fi"
+        )
+        try:
+            run(virt_cmd, 'virt-customize image branding & ssh', weight=5)
+        except Exception as _e:
+            logging.info(f"virt-customize skipped/unavailable: {_e}")
+
         # 2. qm create skeleton
         cores = int(tpl.get('cores', 2))
         memory = int(tpl.get('memory', 2048))
@@ -437,7 +545,7 @@ def _run_deploy(dep_id, cluster_id, node, template_id, storage, vmid, vm_name):
         run(f"qm importdisk {vmid_i} {q_img_path} {q_storage}", 'qm importdisk')
         _update_dep(dep_id, progress=70, log_append='disk imported')
 
-        # 4. attach as scsi0 + cloudinit + boot order
+        # 4. attach as scsi0 + cloudinit + boot order + cicustom vendor snippet
         # the volid passed to qm set is built from the (now-quoted) storage
         # plus the vmid integer; quote the whole arg as a unit so a hostile
         # storage value can't escape.
@@ -447,7 +555,8 @@ def _run_deploy(dep_id, cluster_id, node, template_id, storage, vmid, vm_name):
             f"qm set {vmid_i} --scsihw virtio-scsi-pci "
             f"--scsi0 {scsi_arg} "
             f"--ide2 {ide_arg} "
-            f"--boot c --bootdisk scsi0",
+            f"--boot c --bootdisk scsi0 "
+            f"--cicustom \"vendor=local:snippets/hostpro-vendor.yaml\"",
             'qm set'
         )
         _update_dep(dep_id, progress=85, log_append='cloud-init drive attached')
@@ -780,3 +889,41 @@ def existing_templates(cluster_id):
     except Exception as e:
         logging.debug(f"[templates_lib] existing list failed: {e}")
     return jsonify({'templates': out})
+
+
+@bp.route('/api/clusters/<cluster_id>/nodes/<node>/ensure-vendor-snippet', methods=['POST'])
+@require_auth(perms=['cluster.manage', 'vm.create'])
+def ensure_vendor_snippet_api(cluster_id, node):
+    """Ensure Host Pro Limited Cloud-Init vendor snippet exists on node."""
+    ok, err = check_cluster_access(cluster_id)
+    if not ok: return err
+    if cluster_id not in cluster_managers:
+        return jsonify({'error': 'Cluster not found'}), 404
+    mgr = cluster_managers[cluster_id]
+    try:
+        node_ip = mgr._get_node_ip(node) if hasattr(mgr, '_get_node_ip') else None
+        target_host = node_ip or mgr.host or mgr.config.host
+        ssh = mgr._ssh_connect(target_host)
+        if not ssh:
+            return jsonify({'error': 'SSH connection to node failed'}), 500
+        try:
+            snippet_dir = "/var/lib/vz/snippets"
+            snippet_path = f"{snippet_dir}/hostpro-vendor.yaml"
+            cmd = (
+                f"mkdir -p {snippet_dir} && "
+                f"pvesm set local --content images,iso,vztmpl,backup,snippets 2>/dev/null || true; "
+                f"cat << 'EOF_HP' > {snippet_path}\n"
+                f"{HOSTPRO_VENDOR_SNIPPET}\n"
+                f"EOF_HP\n"
+                f"chmod 0644 {snippet_path}"
+            )
+            stdin, stdout, stderr = ssh.exec_command(cmd, timeout=30)
+            rc = stdout.channel.recv_exit_status()
+            if rc != 0:
+                return jsonify({'error': f'Failed with rc={rc}'}), 500
+            return jsonify({'success': True, 'snippet': 'local:snippets/hostpro-vendor.yaml'})
+        finally:
+            ssh.close()
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+

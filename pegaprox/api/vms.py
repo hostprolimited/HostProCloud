@@ -1295,7 +1295,7 @@ def upload_to_datastore(cluster_id, storage_name):
             # requests streams chunk-by-chunk over the wire. Memory
             # footprint becomes constant in the file size — a 50 GB ISO
             # uses the same RAM as a 5 MB one.
-            from requests_toolbelt.multipart.encoder import MultipartEncoder
+            from requests_toolbelt.multipart.encoder import MultipartEncoder  # type: ignore
             # MK 2026-06-17 — field ORDER matters here: Proxmox's upload parser needs the
             # `content` param to arrive BEFORE the file part, otherwise it rejects the whole
             # request with "content: property is missing and it is not optional". The #525
@@ -4437,9 +4437,14 @@ def clone_vm_api(cluster_id, node, vm_type, vmid):
         # #194: apply Cloud-Init config to cloned QEMU VM (before first boot)
         if vm_type == 'qemu':
             ci_params = {}
-            for ci_key in ('ciuser', 'cipassword', 'sshkeys', 'ipconfig0', 'ipconfig1', 'nameserver', 'searchdomain'):
+            for ci_key in ('ciuser', 'cipassword', 'sshkeys', 'ipconfig0', 'ipconfig1', 'nameserver', 'searchdomain', 'cicustom'):
                 if data.get(ci_key):
                     ci_params[ci_key] = data[ci_key]
+            # Ensure Host Pro vendor snippet is applied if not explicitly customized
+            if 'cicustom' not in ci_params:
+                ci_params['cicustom'] = 'vendor=local:snippets/hostpro-vendor.yaml'
+            ci_params['vga'] = 'default'
+            ci_params['delete'] = 'serial0'
             if ci_params:
                 if 'sshkeys' in ci_params:
                     ci_params['sshkeys'] = sanitize_sshkeys_for_pve(ci_params['sshkeys'])
@@ -4668,7 +4673,7 @@ def _vnc_tunnel_wanted(mgr):
 # console. Costs a single "console opened" line in the PVE log, hence fallback-only.
 def _screenshot_via_rfb(mgr, node, vm_type, vmid, max_width=480, timeout=10):
     import urllib.request, urllib.parse, json as _json, ssl as _ssl
-    import websocket as ws_client
+    import websocket as ws_client  # type: ignore
     from pegaprox.utils import vnc_grab
     host, port = mgr.host, mgr.api_port
 
@@ -4891,7 +4896,7 @@ def vnc_poll(cluster_id, node, vm_type, vmid):
     if action == 'open':
         # acquire PVE auth + vncproxy ticket (mirrors the WS handler flow)
         import urllib.request, urllib.parse, json as _json, ssl as _ssl
-        import websocket as ws_client
+        import websocket as ws_client  # type: ignore
         import base64 as _b64
         host, port = mgr.host, mgr.api_port
 
@@ -10061,7 +10066,7 @@ def handle_vnc_websocket(ws, cluster_id, node, vm_type, vmid):
         import urllib.parse
         import urllib.request
         import json
-        import websocket
+        import websocket  # type: ignore
         
         # Create SSL context
         ssl_context = ssl.create_default_context()
@@ -10453,7 +10458,7 @@ def start_vnc_websocket_server(port=5001, ssl_cert=None, ssl_key=None, host='0.0
             import urllib.parse
             import urllib.request
             import json
-            import websocket as ws_client
+            import websocket as ws_client  # type: ignore
 
             ssl_ctx = ssl.create_default_context()
             # NS Jul 2026 (CodeAnt) — gate TLS verify on the per-cluster ssl_verify flag
@@ -11107,7 +11112,7 @@ def vnc_websocket_proxy(ws, cluster_id, node, vm_type, vmid):
         import urllib.parse
         import urllib.request
         import json
-        import websocket
+        import websocket  # type: ignore
         
         # Create SSL context
         ssl_context = ssl.create_default_context()
