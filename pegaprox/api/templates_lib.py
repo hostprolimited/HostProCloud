@@ -76,7 +76,6 @@ bootcmd:
   - sed -i 's|^#\?Banner.*|Banner /etc/issue.net|' /etc/ssh/sshd_config 2>/dev/null || true
   - systemctl enable qemu-guest-agent 2>/dev/null || true
   - systemctl start qemu-guest-agent 2>/dev/null || true
-  - rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-AlmaLinux-10 2>/dev/null || rpm --import https://repo.almalinux.org/almalinux/RPM-GPG-KEY-AlmaLinux-10 2>/dev/null || true
   - modprobe virtio_balloon 2>/dev/null || true
   - echo "virtio_balloon" > /etc/modules-load.d/virtio-balloon.conf 2>/dev/null || true
 
@@ -275,7 +274,6 @@ runcmd:
   - systemctl restart qemu-guest-agent 2>/dev/null || systemctl start qemu-guest-agent 2>/dev/null || service qemu-guest-agent restart 2>/dev/null || true
   - modprobe virtio_balloon 2>/dev/null || true
   - echo "virtio_balloon" > /etc/modules-load.d/virtio-balloon.conf 2>/dev/null || true
-  - rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY-AlmaLinux-10 2>/dev/null || rpm --import https://repo.almalinux.org/almalinux/RPM-GPG-KEY-AlmaLinux-10 2>/dev/null || true
   - grep -q "00-hostpro-welcome.sh" /etc/bashrc 2>/dev/null || echo '[ -t 1 ] && [ -f /etc/profile.d/00-hostpro-welcome.sh ] && . /etc/profile.d/00-hostpro-welcome.sh' >> /etc/bashrc 2>/dev/null || true
   - grep -q "00-hostpro-welcome.sh" /etc/bash.bashrc 2>/dev/null || echo '[ -t 1 ] && [ -f /etc/profile.d/00-hostpro-welcome.sh ] && . /etc/profile.d/00-hostpro-welcome.sh' >> /etc/bash.bashrc 2>/dev/null || true
   - mkdir -p /etc/ssh/sshd_config.d
