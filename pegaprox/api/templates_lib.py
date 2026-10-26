@@ -56,7 +56,7 @@ HOSTPRO_MOTD_TEXT = (
     "================================================================================\n"
 )
 
-HOSTPRO_VENDOR_SNIPPET = """#cloud-config
+HOSTPRO_VENDOR_SNIPPET = r"""#cloud-config
 ssh_pwauth: true
 disable_root: false
 chpasswd:
