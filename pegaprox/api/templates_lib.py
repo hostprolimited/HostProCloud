@@ -67,13 +67,17 @@ packages:
 
 bootcmd:
   - mkdir -p /etc/ssh/sshd_config.d
-  - printf 'PasswordAuthentication yes\\nPermitRootLogin yes\\nKbdInteractiveAuthentication yes\\n' > /etc/ssh/sshd_config.d/50-cloud-init.conf
-  - printf 'PasswordAuthentication yes\\nPermitRootLogin yes\\nKbdInteractiveAuthentication yes\\n' > /etc/ssh/sshd_config.d/00-hostpro-auth.conf
-  - sed -i 's/^#\\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config 2>/dev/null || true
-  - sed -i 's/^#\\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config 2>/dev/null || true
-  - sed -i 's/^#\\?KbdInteractiveAuthentication.*/KbdInteractiveAuthentication yes/' /etc/ssh/sshd_config 2>/dev/null || true
+  - printf 'PasswordAuthentication yes\nPermitRootLogin yes\nKbdInteractiveAuthentication yes\nBanner /etc/issue.net\nPrintMotd yes\n' > /etc/ssh/sshd_config.d/50-cloud-init.conf
+  - printf 'PasswordAuthentication yes\nPermitRootLogin yes\nKbdInteractiveAuthentication yes\nBanner /etc/issue.net\nPrintMotd yes\n' > /etc/ssh/sshd_config.d/00-hostpro-auth.conf
+  - sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config 2>/dev/null || true
+  - sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config 2>/dev/null || true
+  - sed -i 's/^#\?KbdInteractiveAuthentication.*/KbdInteractiveAuthentication yes/' /etc/ssh/sshd_config 2>/dev/null || true
+  - sed -i 's/^#\?PrintMotd.*/PrintMotd yes/' /etc/ssh/sshd_config 2>/dev/null || true
+  - sed -i 's|^#\?Banner.*|Banner /etc/issue.net|' /etc/ssh/sshd_config 2>/dev/null || true
   - systemctl enable qemu-guest-agent 2>/dev/null || true
   - systemctl start qemu-guest-agent 2>/dev/null || true
+  - modprobe virtio_balloon 2>/dev/null || true
+  - echo "virtio_balloon" > /etc/modules-load.d/virtio-balloon.conf 2>/dev/null || true
 
 write_files:
   - path: /etc/ssh/sshd_config.d/50-cloud-init.conf
@@ -82,6 +86,8 @@ write_files:
       PasswordAuthentication yes
       PermitRootLogin yes
       KbdInteractiveAuthentication yes
+      Banner /etc/issue.net
+      PrintMotd yes
 
   - path: /etc/ssh/sshd_config.d/00-hostpro-auth.conf
     permissions: '0644'
@@ -89,6 +95,8 @@ write_files:
       PasswordAuthentication yes
       PermitRootLogin yes
       KbdInteractiveAuthentication yes
+      Banner /etc/issue.net
+      PrintMotd yes
 
   - path: /etc/systemd/system/hostpro-ssh-auth.service
     permissions: '0644'
@@ -102,7 +110,7 @@ write_files:
 
       [Service]
       Type=oneshot
-      ExecStart=/bin/sh -c "mkdir -p /etc/ssh/sshd_config.d; printf 'PasswordAuthentication yes\\nPermitRootLogin yes\\nKbdInteractiveAuthentication yes\\n' > /etc/ssh/sshd_config.d/50-cloud-init.conf; printf 'PasswordAuthentication yes\\nPermitRootLogin yes\\nKbdInteractiveAuthentication yes\\n' > /etc/ssh/sshd_config.d/00-hostpro-auth.conf; sed -i 's/^#\\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config 2>/dev/null || true; sed -i 's/^#\\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config 2>/dev/null || true; sed -i 's/^#\\?KbdInteractiveAuthentication.*/KbdInteractiveAuthentication yes/' /etc/ssh/sshd_config 2>/dev/null || true; systemctl restart ssh 2>/dev/null || systemctl restart sshd 2>/dev/null || true"
+      ExecStart=/bin/sh -c "mkdir -p /etc/ssh/sshd_config.d; printf 'PasswordAuthentication yes\\nPermitRootLogin yes\\nKbdInteractiveAuthentication yes\\nBanner /etc/issue.net\\nPrintMotd yes\\n' > /etc/ssh/sshd_config.d/50-cloud-init.conf; printf 'PasswordAuthentication yes\\nPermitRootLogin yes\\nKbdInteractiveAuthentication yes\\nBanner /etc/issue.net\\nPrintMotd yes\\n' > /etc/ssh/sshd_config.d/00-hostpro-auth.conf; sed -i 's/^#\\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config 2>/dev/null || true; sed -i 's/^#\\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config 2>/dev/null || true; sed -i 's/^#\\?KbdInteractiveAuthentication.*/KbdInteractiveAuthentication yes/' /etc/ssh/sshd_config 2>/dev/null || true; sed -i 's/^#\\?PrintMotd.*/PrintMotd yes/' /etc/ssh/sshd_config 2>/dev/null || true; sed -i 's|^#\\?Banner.*|Banner /etc/issue.net|' /etc/ssh/sshd_config 2>/dev/null || true; systemctl restart ssh 2>/dev/null || systemctl restart sshd 2>/dev/null || true"
       RemainAfterExit=true
 
       [Install]
@@ -210,14 +218,27 @@ write_files:
     permissions: '0644'
     content: |
       ================================================================================
+       _    _           _     _____             _      _           _ _           _ 
+      | |  | |         | |   |  __ \           | |    (_)         (_) |         | |
+      | |__| | ___  ___| |_  | |__) | __ ___   | |     _ _ __ ___  _| |_ ___  __| |
+      |  __  |/ _ \/ __| __| |  ___/ '__/ _ \  | |    | | '_ ` _ \| | __/ _ \/ _` |
+      | |  | | (_) \__ \ |_  | |   | | | (_) | | |____| | | | | | | | ||  __/ (_| |
+      |_|  |_|\___/|___/\__| |_|   |_|  \___/  |______|_|_| |_| |_|_|\__\___|\__,_|
+
                        WELCOME TO HOST PRO LIMITED CLOUD VPS
+      ================================================================================
+       * Client Portal:        https://portal.hostpro.co.ke/clientarea.php
+       * Technical Support:    support@hostpro.co.ke
+       * Website:              https://www.hostpro.co.ke/
+      --------------------------------------------------------------------------------
+       Thank you for hosting with Host Pro Limited!
       ================================================================================
 
   - path: /etc/profile.d/00-hostpro-welcome.sh
     permissions: '0755'
     content: |
       #!/bin/sh
-      [ -z "$PS1" ] && return
+      [ -t 1 ] || return
       cat << 'BANNER_EOF'
       ================================================================================
        _    _           _     _____             _      _           _ _           _ 
@@ -240,7 +261,7 @@ write_files:
   - path: /etc/issue
     permissions: '0644'
     content: |
-      Host Pro Limited Cloud Virtual Server (\\n) (\\l)
+      Host Pro Limited Cloud Virtual Server (\l)
 
 runcmd:
   - systemctl daemon-reload 2>/dev/null || true
@@ -251,12 +272,18 @@ runcmd:
   - which qemu-ga >/dev/null 2>&1 || (apt-get update && apt-get install -y qemu-guest-agent) || dnf install -y qemu-guest-agent || yum install -y qemu-guest-agent || zypper install -y qemu-guest-agent || apk add qemu-guest-agent 2>/dev/null || true
   - systemctl enable --now qemu-guest-agent 2>/dev/null || true
   - systemctl restart qemu-guest-agent 2>/dev/null || systemctl start qemu-guest-agent 2>/dev/null || service qemu-guest-agent restart 2>/dev/null || true
+  - modprobe virtio_balloon 2>/dev/null || true
+  - echo "virtio_balloon" > /etc/modules-load.d/virtio-balloon.conf 2>/dev/null || true
+  - grep -q "00-hostpro-welcome.sh" /etc/bashrc 2>/dev/null || echo '[ -t 1 ] && [ -f /etc/profile.d/00-hostpro-welcome.sh ] && . /etc/profile.d/00-hostpro-welcome.sh' >> /etc/bashrc 2>/dev/null || true
+  - grep -q "00-hostpro-welcome.sh" /etc/bash.bashrc 2>/dev/null || echo '[ -t 1 ] && [ -f /etc/profile.d/00-hostpro-welcome.sh ] && . /etc/profile.d/00-hostpro-welcome.sh' >> /etc/bash.bashrc 2>/dev/null || true
   - mkdir -p /etc/ssh/sshd_config.d
-  - printf 'PasswordAuthentication yes\\nPermitRootLogin yes\\nKbdInteractiveAuthentication yes\\n' > /etc/ssh/sshd_config.d/50-cloud-init.conf
-  - printf 'PasswordAuthentication yes\\nPermitRootLogin yes\\nKbdInteractiveAuthentication yes\\n' > /etc/ssh/sshd_config.d/00-hostpro-auth.conf
-  - sed -i 's/^#\\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config 2>/dev/null || true
-  - sed -i 's/^#\\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config 2>/dev/null || true
-  - sed -i 's/^#\\?KbdInteractiveAuthentication.*/KbdInteractiveAuthentication yes/' /etc/ssh/sshd_config 2>/dev/null || true
+  - printf 'PasswordAuthentication yes\nPermitRootLogin yes\nKbdInteractiveAuthentication yes\nBanner /etc/issue.net\nPrintMotd yes\n' > /etc/ssh/sshd_config.d/50-cloud-init.conf
+  - printf 'PasswordAuthentication yes\nPermitRootLogin yes\nKbdInteractiveAuthentication yes\nBanner /etc/issue.net\nPrintMotd yes\n' > /etc/ssh/sshd_config.d/00-hostpro-auth.conf
+  - sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config 2>/dev/null || true
+  - sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config 2>/dev/null || true
+  - sed -i 's/^#\?KbdInteractiveAuthentication.*/KbdInteractiveAuthentication yes/' /etc/ssh/sshd_config 2>/dev/null || true
+  - sed -i 's/^#\?PrintMotd.*/PrintMotd yes/' /etc/ssh/sshd_config 2>/dev/null || true
+  - sed -i 's|^#\?Banner.*|Banner /etc/issue.net|' /etc/ssh/sshd_config 2>/dev/null || true
   - sysctl --system 2>/dev/null || sysctl -p /etc/sysctl.d/99-hostpro-performance.conf 2>/dev/null || true
   - systemctl restart ssh || systemctl restart sshd || service ssh restart || service sshd restart 2>/dev/null || true
 

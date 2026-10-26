@@ -6994,14 +6994,35 @@ def resize_vm_disk_api(cluster_id, node, vm_type, vmid):
 
         # Auto-start VM if stopped after resize
         if data.get('start', True):
-            try:
-                st = manager.get_vm_status(node, vmid, vm_type)
-                cur_st = st.get('status') or (st.get('data', {}).get('status') if isinstance(st.get('data'), dict) else '')
-                if cur_st == 'stopped':
-                    manager.start_vm(node, vmid, vm_type)
-                    logging.info(f"[RESIZE] Auto-started {vm_type}/{vmid} after disk resize")
-            except Exception as start_err:
-                logging.warning(f"[RESIZE] Could not auto-start {vm_type}/{vmid} after disk resize: {start_err}")
+            import time
+            # 1. Wait for Proxmox disk resize task lock to clear
+            for _ in range(20):
+                try:
+                    cfg = manager.get_vm_config(node, vmid, vm_type)
+                    vm_cfg = cfg.get('config', {}) if isinstance(cfg, dict) else {}
+                    if not vm_cfg.get('lock'):
+                        break
+                except Exception:
+                    pass
+                time.sleep(1)
+
+            # 2. Start VM if stopped (retry up to 5 times if lock is still settling)
+            for _attempt in range(5):
+                try:
+                    st = manager.get_vm_status(node, vmid, vm_type)
+                    cur_st = st.get('status') or (st.get('data', {}).get('status') if isinstance(st.get('data'), dict) else '')
+                    if cur_st == 'stopped':
+                        start_res = manager.start_vm(node, vmid, vm_type)
+                        if start_res and start_res.get('success'):
+                            logging.info(f"[RESIZE] Auto-started {vm_type}/{vmid} after disk resize")
+                            break
+                        else:
+                            time.sleep(1.5)
+                    else:
+                        break
+                except Exception as start_err:
+                    logging.warning(f"[RESIZE] Could not auto-start {vm_type}/{vmid} after disk resize (attempt {_attempt+1}): {start_err}")
+                    time.sleep(1.5)
 
         return jsonify({'message': result['message']})
     else:
