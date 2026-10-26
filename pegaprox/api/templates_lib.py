@@ -660,7 +660,6 @@ def _run_deploy(dep_id, cluster_id, node, template_id, storage, vmid, vm_name):
             f"--ide2 {ide_arg} "
             f"--boot c --bootdisk scsi0 "
             f"--agent 1,fstrim_cloned_disks=1 "
-            f"--delete serial0,vga "
             f"--cicustom \"vendor=local:snippets/hostpro-vendor.yaml\"",
             'qm set'
         )
@@ -1026,7 +1025,7 @@ def ensure_vendor_snippet_api(cluster_id, node):
                 f"chmod 0644 {snippet_path}; "
                 f"for tmpl_id in $(qm list 2>/dev/null | awk '$1 ~ /^[0-9]+$/ {{print $1}}'); do "
                 f"  if qm config $tmpl_id 2>/dev/null | grep -q 'template: 1'; then "
-                f"    qm set $tmpl_id --agent 1,fstrim_cloned_disks=1 --cicustom 'vendor=local:snippets/hostpro-vendor.yaml' --delete serial0,vga 2>/dev/null || true; "
+                f"    qm set $tmpl_id --agent 1,fstrim_cloned_disks=1 --cicustom 'vendor=local:snippets/hostpro-vendor.yaml' 2>/dev/null || true; "
                 f"  fi; "
                 f"done"
             )
