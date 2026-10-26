@@ -5725,6 +5725,27 @@ def update_vm_config_api(cluster_id, node, vm_type, vmid):
         return jsonify({'error': result['error']}), 500
 
 
+@bp.route('/api/clusters/<cluster_id>/vms/<node>/qemu/<int:vmid>/cloudinit', methods=['PUT', 'POST'])
+@require_auth(perms=['vm.config'])
+def regenerate_cloudinit_api(cluster_id, node, vmid):
+    ok, err = check_cluster_access(cluster_id)
+    if not ok:
+        return err
+    if cluster_id not in cluster_managers:
+        return jsonify({'error': 'Cluster not found'}), 404
+
+    manager = cluster_managers[cluster_id]
+    user = build_authz_user(request.session.get('user', ''), request.session)
+    if not user_can_access_vm(user, cluster_id, vmid, 'vm.config', 'qemu'):
+        return jsonify({'error': 'Permission denied: vm.config'}), 403
+
+    result = manager.regenerate_cloudinit(node, vmid)
+    if result.get('success'):
+        log_audit(getattr(request, 'session', {}).get('user', 'system'), 'vm.cloudinit_regenerated', f"QEMU {vmid} Cloud-Init image regenerated", cluster=manager.config.name)
+        return jsonify(result)
+    return jsonify({'error': result.get('error', 'Failed to regenerate cloudinit')}), 500
+
+
 @bp.route('/api/clusters/<cluster_id>/vms/<node>/<vm_type>/<int:vmid>/sanitize-boot-order', methods=['POST'])
 @require_auth(perms=['vm.config'])
 def sanitize_boot_order_api(cluster_id, node, vm_type, vmid):

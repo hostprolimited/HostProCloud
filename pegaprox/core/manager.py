@@ -16347,6 +16347,13 @@ echo "AGENT_INSTALLED_OK"
 
             if response.status_code == 200:
                 self.logger.info(f"[OK] Config updated for {vm_type}/{vmid}")
+                if vm_type == 'qemu' and any(k in config_updates for k in ('cipassword', 'ciuser', 'sshkeys', 'ipconfig0', 'ipconfig1', 'nameserver', 'searchdomain')):
+                    try:
+                        ci_url = f"https://{self.host}:{self.api_port}/api2/json/nodes/{node}/qemu/{vmid}/cloudinit"
+                        self._api_put(ci_url, data={})
+                        self.logger.info(f"[OK] Cloud-Init image regenerated for QEMU {vmid}")
+                    except Exception as _ce:
+                        self.logger.warning(f"Cloud-Init regeneration: {_ce}")
                 return {'success': True, 'message': 'Configuration updated'}
             else:
                 error_msg = response.text
@@ -16355,6 +16362,20 @@ echo "AGENT_INSTALLED_OK"
                 
         except Exception as e:
             self.logger.error(f"[ERROR] Update config error: {e}")
+            return {'success': False, 'error': str(e)}
+
+    def regenerate_cloudinit(self, node: str, vmid: int) -> Dict[str, Any]:
+        """Regenerate Cloud-Init ISO on Proxmox node (equivalent to qm cloudinit update)."""
+        if not self.is_connected:
+            if not self.connect_to_proxmox():
+                return {'success': False, 'error': 'Could not connect to Proxmox'}
+        try:
+            url = f"https://{self.host}:{self.api_port}/api2/json/nodes/{node}/qemu/{vmid}/cloudinit"
+            resp = self._api_put(url, data={})
+            if resp.status_code == 200:
+                return {'success': True, 'message': 'Cloud-Init image regenerated'}
+            return {'success': False, 'error': resp.text}
+        except Exception as e:
             return {'success': False, 'error': str(e)}
     
     def sanitize_boot_order(self, node: str, vmid: int, vm_type: str) -> Dict[str, Any]:
