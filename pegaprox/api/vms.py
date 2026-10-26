@@ -6991,6 +6991,18 @@ def resize_vm_disk_api(cluster_id, node, vm_type, vmid):
         # Audit log
         user = getattr(request, 'session', {}).get('user', 'system')
         log_audit(user, 'vm.disk_resized', f"{vm_type.upper()} {vmid} disk {disk} resized to {size}", cluster=manager.config.name)
+
+        # Auto-start VM if stopped after resize
+        if data.get('start', True):
+            try:
+                st = manager.get_vm_status(node, vmid, vm_type)
+                cur_st = st.get('status') or (st.get('data', {}).get('status') if isinstance(st.get('data'), dict) else '')
+                if cur_st == 'stopped':
+                    manager.start_vm(node, vmid, vm_type)
+                    logging.info(f"[RESIZE] Auto-started {vm_type}/{vmid} after disk resize")
+            except Exception as start_err:
+                logging.warning(f"[RESIZE] Could not auto-start {vm_type}/{vmid} after disk resize: {start_err}")
+
         return jsonify({'message': result['message']})
     else:
         return jsonify({'error': result['error']}), 500
