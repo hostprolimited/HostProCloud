@@ -4439,21 +4439,19 @@ def clone_vm_api(cluster_id, node, vm_type, vmid):
         # #194: apply Cloud-Init config to cloned QEMU VM (before first boot)
         if vm_type == 'qemu':
             ci_params = {}
-            for ci_key in ('ciuser', 'cipassword', 'sshkeys', 'ipconfig0', 'ipconfig1', 'nameserver', 'searchdomain', 'cicustom'):
-                if data.get(ci_key):
+            for ci_key in ('ciuser', 'cipassword', 'sshkeys', 'ipconfig0', 'ipconfig1', 'ipconfig2', 'nameserver', 'searchdomain', 'cicustom', 'cores', 'memory', 'balloon', 'cpu', 'sockets', 'scsihw', 'numa', 'onboot', 'hotplug', 'tags', 'description'):
+                if data.get(ci_key) is not None:
                     ci_params[ci_key] = data[ci_key]
             # Ensure Host Pro vendor snippet is applied if not explicitly customized
             if 'cicustom' not in ci_params:
                 ci_params['cicustom'] = 'vendor=local:snippets/hostpro-vendor.yaml'
             # Ensure QEMU Guest Agent is enabled
             ci_params['agent'] = data.get('agent') or '1,fstrim_cloned_disks=1'
-            # Display: Default display and NOT serial0 (delete serial0 and vga so PVE defaults to standard VGA)
-            del_targets = {'serial0', 'vga'}
-            if 'delete' in ci_params:
-                existing_del = [d.strip() for d in str(ci_params['delete']).split(',') if d.strip()]
-                del_targets.update(existing_del)
-            ci_params['delete'] = ','.join(sorted(del_targets))
-            ci_params.pop('vga', None)
+            # Only delete keys if explicitly requested by caller
+            if data.get('delete'):
+                del_targets = [d.strip() for d in str(data['delete']).split(',') if d.strip()]
+                if del_targets:
+                    ci_params['delete'] = ','.join(sorted(set(del_targets)))
             if ci_params:
                 if 'sshkeys' in ci_params:
                     ci_params['sshkeys'] = sanitize_sshkeys_for_pve(ci_params['sshkeys'])
@@ -4469,9 +4467,30 @@ def clone_vm_api(cluster_id, node, vm_type, vmid):
                         if 'cicustom' in ci_params and ('cicustom' in resp.text.lower() or 'snippet' in resp.text.lower()):
                             fallback_params = {k: v for k, v in ci_params.items() if k != 'cicustom'}
                             manager._api_post(ci_url, data=fallback_params)
-                    logging.info(f"[CLONE] Applied Cloud-Init config to VM {newid}: {list(ci_params.keys())}")
+                    logging.info(f"[CLONE] Applied Cloud-Init/hardware config to VM {newid}: {list(ci_params.keys())}")
+
+                    # Resize disk if requested in clone payload
+                    disk_size = data.get('disk') or data.get('disk_gb') or data.get('size')
+                    if disk_size:
+                        try:
+                            disk_str = f"{disk_size}G" if str(disk_size).isdigit() else str(disk_size)
+                            disk_drive = data.get('disk_target') or 'scsi0'
+                            manager.resize_vm_disk(clone_node, int(newid), 'qemu', disk_drive, disk_str)
+                            logging.info(f"[CLONE] Resized disk {disk_drive} to {disk_str} for VM {newid}")
+                        except Exception as re_err:
+                            logging.warning(f"[CLONE] Disk resize failed for {newid}: {re_err}")
+
+                    # Regenerate Cloud-Init ISO so Proxmox updates user, password, IP and vendor snippet
+                    try:
+                        manager.regenerate_cloudinit(clone_node, int(newid))
+                        logging.info(f"[CLONE] Cloud-Init ISO regenerated for VM {newid}")
+                    except Exception as ci_err:
+                        logging.warning(f"[CLONE] Cloud-Init regeneration failed for {newid}: {ci_err}")
+
+                    if data.get('start'):
+                        manager.start_vm(clone_node, int(newid), 'qemu')
                 except Exception as e:
-                    logging.warning(f"[CLONE] Cloud-Init config failed for {newid}: {e}")
+                    logging.warning(f"[CLONE] Post-clone setup failed for {newid}: {e}")
 
         # Audit log
         user = getattr(request, 'session', {}).get('user', 'system')
